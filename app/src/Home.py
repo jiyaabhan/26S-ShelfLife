@@ -79,7 +79,7 @@ with col3:
     st.write('**Data Analyst**')
     analyst = st.selectbox(
         'Select analyst account:',
-        ['Ricky Spiffy', 'Dana Cross'],
+        ['Ricky Spiffy'],
         key='analyst_select'
     )
     if st.button('Log in as Analyst', type='primary', use_container_width=True):
@@ -93,7 +93,7 @@ with col4:
     st.write('**Platform Admin**')
     admin = st.selectbox(
         'Select admin account:',
-        ['Jordan Kanpa', 'Sarah Mitchell'],
+        ['Jordan Kanpa'],
         key='admin_select'
     )
     if st.button('Log in as Admin', type='primary', use_container_width=True):
