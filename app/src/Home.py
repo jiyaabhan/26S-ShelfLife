@@ -49,7 +49,7 @@ with col1:
     st.write('**Student Seller**')
     seller = st.selectbox(
         'Select seller account:',
-        ['Maya Thomas', 'Priya Nair'],
+        ['Maya Thomas'],
         key='seller_select'
     )
     if st.button('Log in as Seller', type='primary', use_container_width=True):
