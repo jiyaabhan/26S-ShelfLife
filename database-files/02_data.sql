@@ -1,4 +1,5 @@
 SET FOREIGN_KEY_CHECKS = 0;
+
 INSERT INTO USER (name, email, is_active, avg_rating, created_at) VALUES
 ('Maya Thomas',       'thomas.ma@northeastern.edu',   1, 4.80, '2024-08-15 09:10:00'),
 ('Ethan Park',        'park.et@northeastern.edu',     1, NULL, '2024-08-20 11:22:00'),
@@ -35,18 +36,21 @@ INSERT INTO USER (name, email, is_active, avg_rating, created_at) VALUES
 ('Charlotte Lewis',   'lewis.ch@northeastern.edu',    1, 4.90, '2024-10-05 13:15:00'),
 ('Alexander Young',   'young.al@northeastern.edu',    0, 3.50, '2024-10-06 14:30:00'),
 ('Victoria Walker',   'walker.vi@northeastern.edu',   1, NULL, '2024-10-07 09:00:00');
+
 INSERT INTO ADMIN (name, email) VALUES
 ('Jordan Kanpa',    'kanpa.jo@shelflife.io'),
 ('Sarah Mitchell',  'mitchell.sa@shelflife.io'),
 ('Derek Osei',      'osei.de@shelflife.io'),
 ('Priya Suresh',    'suresh.pr@shelflife.io'),
 ('Marcus Webb',     'webb.ma@shelflife.io');
+
 INSERT INTO ANALYST (name, email) VALUES
 ('Ricky Spiffy',  'spiffy.ri@shelflife.io'),
 ('Dana Cross',    'cross.da@shelflife.io'),
 ('Tamika Porter', 'porter.ta@shelflife.io'),
 ('Wei Zhang',     'zhang.we@shelflife.io'),
 ('Olivia Grant',  'grant.ol@shelflife.io');
+
 INSERT INTO DEPARTMENT (dept_name, college) VALUES
 ('Computer Science',           'Khoury College of Computer Sciences'),
 ('Electrical & Computer Eng.', 'College of Engineering'),
@@ -60,6 +64,7 @@ INSERT INTO DEPARTMENT (dept_name, college) VALUES
 ('Finance',                    'D\'Amore-McKim School of Business'),
 ('Psychology',                 'College of Social Sciences & Humanities'),
 ('English',                    'College of Social Sciences & Humanities');
+
 INSERT INTO PLATFORM_METRIC (active_users, total_listings, total_transactions, recorded_at) VALUES
 (210, 489,  312, '2024-01-15 00:00:00'),
 (224, 502,  334, '2024-02-01 00:00:00'),
@@ -91,6 +96,7 @@ INSERT INTO PLATFORM_METRIC (active_users, total_listings, total_transactions, r
 (580, 1268, 855, '2025-04-01 00:00:00'),
 (589, 1310, 901, '2025-04-15 00:00:00'),
 (600, 1350, 930, '2025-05-01 00:00:00');
+
 INSERT INTO COURSE (dept_id, course_number, course_name, semester, is_active) VALUES
 (1, 'CS 1200',  'Introduction to CS Profession',        'Spring 2026', 1),
 (1, 'CS 2500',  'Fundamentals of Computer Science 1',   'Spring 2026', 1),
@@ -132,6 +138,7 @@ INSERT INTO COURSE (dept_id, course_number, course_name, semester, is_active) VA
 (12,'ENGL 2700','American Literature',                  'Spring 2026', 1),
 (1, 'CS 3800',  'Theory of Computation',                'Fall 2025',   0),
 (3, 'MECH 2150','Engineering Graphics',                 'Fall 2025',   0);
+
 INSERT INTO ITEM (title, author, isbn, category) VALUES
 ('Introduction to Algorithms, 4th Ed.',        'Cormen, Leiserson, Rivest, Stein', '9780262046305', 'Textbook'),
 ('Clean Code',                                 'Robert C. Martin',                 '9780132350884', 'Textbook'),
@@ -173,6 +180,7 @@ INSERT INTO ITEM (title, author, isbn, category) VALUES
 ('Adobe Creative Cloud – 1 Year License',      NULL,                               NULL,            'Software License'),
 ('Microsoft Office 365 – 1 Year License',      NULL,                               NULL,            'Software License'),
 ('AutoCAD Student License – 1 Year',           NULL,                               NULL,            'Software License');
+
 INSERT INTO REPORT (analyst_id, filter_params, export_format, created_at) VALUES
 (1, 'dept_name=Computer Science; semester=Fall 2025',      'CSV',  '2025-05-10 09:00:00'),
 (1, 'college=Khoury; semester=Spring 2026',                'CSV',  '2026-01-20 10:15:00'),
@@ -194,6 +202,7 @@ INSERT INTO REPORT (analyst_id, filter_params, export_format, created_at) VALUES
 (4, 'dept_name=Psychology; semester=Spring 2026',          'CSV',  '2026-03-15 09:00:00'),
 (5, 'underserved_demand; semester=Spring 2026',            'XLSX', '2026-03-18 11:30:00'),
 (5, 'active_users_by_college; semester=Spring 2026',       'CSV',  '2026-03-20 14:00:00');
+
 INSERT INTO COURSE_MATERIAL (course_id, item_id, required) VALUES
 (1, 39, 1), 
 (2, 1,  1), 
@@ -251,6 +260,7 @@ INSERT INTO COURSE_MATERIAL (course_id, item_id, required) VALUES
 (36, 24, 1), 
 (37, 23, 1), 
 (38, 23, 0); 
+
 INSERT INTO PRICE_HISTORY (item_id, semester, avg_price, low_price, high_price, total_sales) VALUES
 (1, 'Fall 2023',   95.00,  70.00, 120.00, 18),
 (1, 'Spring 2024',110.00,  80.00, 140.00, 22),
@@ -312,6 +322,7 @@ INSERT INTO PRICE_HISTORY (item_id, semester, avg_price, low_price, high_price, 
 (10,'Spring 2024',135.00, 100.00, 170.00, 12),
 (10,'Fall 2024',  128.00,  93.00, 163.00, 10),
 (10,'Spring 2025',137.00, 102.00, 172.00, 13);
+
 INSERT INTO BUNDLE (user_id, total_price, created_at) VALUES
 (1,  280.00, '2025-08-20 10:00:00'),
 (3,  110.00, '2025-08-21 11:00:00'),
@@ -333,6 +344,7 @@ INSERT INTO BUNDLE (user_id, total_price, created_at) VALUES
 (33, 360.00, '2025-09-06 14:00:00'),
 (35, 220.00, '2025-09-07 10:45:00'),
 (1,  170.00, '2025-09-08 09:30:00');
+
 INSERT INTO LISTING (user_id, item_id, course_id, price, condition_desc, status, created_at, search_count) VALUES
 (1,  1,  4,  215.00, 'Lightly Used',  'Sold',     '2025-08-10 09:00:00', 42),
 (1,  3,  5,   65.00, 'Unused',        'Active',   '2025-08-11 10:00:00', 28),
@@ -414,6 +426,7 @@ INSERT INTO LISTING (user_id, item_id, course_id, price, condition_desc, status,
 (32, 3,  5,    68.00,'Good',          'Active',   '2025-10-28 10:30:00', 35),
 (32, 10, 16,  122.00,'Good',          'Active',   '2025-10-29 11:30:00', 43),
 (32, 7,  3,    42.00,'Very Good',     'Active',   '2025-10-30 12:30:00', 18);
+
 INSERT INTO TRANSACTION (listing_id, buyer_id, sale_price, sold_at, days_to_sale) VALUES
 (1,  2,  210.00, '2025-09-05 14:30:00', 26),
 (4,  10, 38.00,  '2025-09-08 11:00:00', 26),
@@ -452,6 +465,7 @@ INSERT INTO TRANSACTION (listing_id, buyer_id, sale_price, sold_at, days_to_sale
 (30, 13, 130.00, '2025-11-04 09:00:00', 13),
 (14, 24, 48.00,  '2025-11-05 10:00:00', 12),
 (26, 14, 105.00, '2025-11-06 11:00:00', 11);
+
 INSERT INTO REVIEW (listing_id, reviewer_id, seller_id, rating, comment, created_at) VALUES
 (1,  2,  1,  5, 'Excellent condition, exactly as described. Super easy pickup!', '2025-09-06 10:00:00'),
 (1,  10, 1,  5, 'Maya was great, very responsive and the book was perfect.',     '2025-09-07 11:00:00'),
@@ -508,6 +522,7 @@ INSERT INTO REVIEW (listing_id, reviewer_id, seller_id, rating, comment, created
 (8,  30, 3,  4, 'Campbell Biology from Priya was well cared for.',                 '2025-10-10 11:00:00'),
 (12, 16, 4,  5, 'Jordan\'s University Physics set had everything I needed.',       '2025-10-20 09:00:00'),
 (19, 7,  5,  4, 'Corporate Finance book from Sofia was clean and readable.',       '2025-10-30 10:00:00');
+  
 INSERT INTO WISHLIST (user_id, listing_id, saved_at) VALUES
 (2,  1,  '2025-08-11 10:00:00'),
 (2,  2,  '2025-08-12 11:00:00'),
@@ -633,6 +648,7 @@ INSERT INTO WISHLIST (user_id, listing_id, saved_at) VALUES
 (31, 73, '2025-11-05 12:00:00'),
 (33, 45, '2025-10-05 13:00:00'),
 (35, 53, '2025-10-13 09:00:00');
+
 INSERT INTO FLAG (listing_id, reason, flag_status, flagged_at) VALUES
 (1,  'Condition misrepresented – buyer says book has heavy highlighting.',  'Resolved', '2025-09-06 12:00:00'),
 (6,  'Incorrect course association listed.',                                'Resolved', '2025-09-11 11:00:00'),
@@ -664,6 +680,7 @@ INSERT INTO FLAG (listing_id, reason, flag_status, flagged_at) VALUES
 (70, 'Listing description copied verbatim from another seller.',            'Pending',  '2025-11-11 09:00:00'),
 (75, 'Multiple wishlists from same IP for the same listing.',               'Pending',  '2025-11-12 10:00:00'),
 (78, 'Item ISBN does not match listed title.',                              'Resolved', '2025-11-13 11:00:00');
+
 INSERT INTO BUNDLE_LISTING (bundle_id, listing_id) VALUES
 (1,  1),
 (1,  2),
@@ -710,6 +727,7 @@ INSERT INTO BUNDLE_LISTING (bundle_id, listing_id) VALUES
 (17, 79),
 (17, 80),
 (20, 5);
+  
 INSERT INTO ADMIN_FLAG (admin_id, flag_id) VALUES
 (1, 1),
 (1, 2),
