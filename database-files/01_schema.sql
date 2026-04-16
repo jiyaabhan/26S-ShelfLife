@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS ANALYST;
 DROP TABLE IF EXISTS REPORT;
 DROP TABLE IF EXISTS PLATFORM_METRIC;
 SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE TABLE USER (
     user_id    INT          NOT NULL AUTO_INCREMENT,
     name       VARCHAR(100) NOT NULL,
@@ -27,24 +28,28 @@ CREATE TABLE USER (
     created_at DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id)
 );
+
 CREATE TABLE ADMIN (
     admin_id INT          NOT NULL AUTO_INCREMENT,
     name     VARCHAR(100) NOT NULL,
     email    VARCHAR(200) NOT NULL UNIQUE,
     PRIMARY KEY (admin_id)
 );
+
 CREATE TABLE ANALYST (
     analyst_id INT          NOT NULL AUTO_INCREMENT,
     name       VARCHAR(100) NOT NULL,
     email      VARCHAR(200) NOT NULL UNIQUE,
     PRIMARY KEY (analyst_id)
 );
+
 CREATE TABLE DEPARTMENT (
     dept_id   INT          NOT NULL AUTO_INCREMENT,
     dept_name VARCHAR(100) NOT NULL,
     college   VARCHAR(100) NOT NULL,
     PRIMARY KEY (dept_id)
 );
+
 CREATE TABLE PLATFORM_METRIC (
     metric_id          INT      NOT NULL AUTO_INCREMENT,
     active_users       INT      NOT NULL,
@@ -53,6 +58,7 @@ CREATE TABLE PLATFORM_METRIC (
     recorded_at        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (metric_id)
 );
+
 CREATE TABLE COURSE (
     course_id     INT          NOT NULL AUTO_INCREMENT,
     dept_id       INT          NOT NULL,
@@ -63,6 +69,7 @@ CREATE TABLE COURSE (
     PRIMARY KEY (course_id),
     FOREIGN KEY (dept_id) REFERENCES DEPARTMENT(dept_id)
 );
+
 CREATE TABLE ITEM (
     item_id   INT          NOT NULL AUTO_INCREMENT,
     title     VARCHAR(200) NOT NULL,
@@ -71,6 +78,7 @@ CREATE TABLE ITEM (
     category  VARCHAR(50)  NOT NULL,
     PRIMARY KEY (item_id)
 );
+
 CREATE TABLE REPORT (
     report_id     INT         NOT NULL AUTO_INCREMENT,
     analyst_id    INT         NOT NULL,
@@ -80,6 +88,7 @@ CREATE TABLE REPORT (
     PRIMARY KEY (report_id),
     FOREIGN KEY (analyst_id) REFERENCES ANALYST(analyst_id)
 );
+
 CREATE TABLE COURSE_MATERIAL (
     course_material_id INT          NOT NULL AUTO_INCREMENT,
     course_id          INT          NOT NULL,
@@ -90,6 +99,7 @@ CREATE TABLE COURSE_MATERIAL (
     FOREIGN KEY (course_id) REFERENCES COURSE(course_id),
     FOREIGN KEY (item_id)   REFERENCES ITEM(item_id)
 );
+
 CREATE TABLE PRICE_HISTORY (
     history_id  INT            NOT NULL AUTO_INCREMENT,
     item_id     INT            NOT NULL,
@@ -101,6 +111,7 @@ CREATE TABLE PRICE_HISTORY (
     PRIMARY KEY (history_id),
     FOREIGN KEY (item_id) REFERENCES ITEM(item_id)
 );
+
 CREATE TABLE BUNDLE (
     bundle_id   INT            NOT NULL AUTO_INCREMENT,
     user_id     INT            NOT NULL,
@@ -109,6 +120,7 @@ CREATE TABLE BUNDLE (
     PRIMARY KEY (bundle_id),
     FOREIGN KEY (user_id) REFERENCES USER(user_id)
 );
+
 CREATE TABLE LISTING (
     listing_id     INT            NOT NULL AUTO_INCREMENT,
     user_id        INT            NOT NULL,
@@ -124,6 +136,7 @@ CREATE TABLE LISTING (
     FOREIGN KEY (item_id)   REFERENCES ITEM(item_id),
     FOREIGN KEY (course_id) REFERENCES COURSE(course_id)
 );
+
 CREATE TABLE TRANSACTION (
     transaction_id INT            NOT NULL AUTO_INCREMENT,
     listing_id     INT            NOT NULL UNIQUE,
@@ -135,6 +148,7 @@ CREATE TABLE TRANSACTION (
     FOREIGN KEY (listing_id) REFERENCES LISTING(listing_id),
     FOREIGN KEY (buyer_id)   REFERENCES USER(user_id)
 );
+
 CREATE TABLE REVIEW (
     review_id   INT      NOT NULL AUTO_INCREMENT,
     listing_id  INT      NOT NULL,
@@ -149,6 +163,7 @@ CREATE TABLE REVIEW (
     FOREIGN KEY (reviewer_id) REFERENCES USER(user_id),
     FOREIGN KEY (seller_id)   REFERENCES USER(user_id)
 );
+
 CREATE TABLE WISHLIST (
     wishlist_id INT      NOT NULL AUTO_INCREMENT,
     user_id     INT      NOT NULL,
@@ -159,6 +174,7 @@ CREATE TABLE WISHLIST (
     FOREIGN KEY (user_id)    REFERENCES USER(user_id),
     FOREIGN KEY (listing_id) REFERENCES LISTING(listing_id)
 );
+
 CREATE TABLE FLAG (
     flag_id     INT         NOT NULL AUTO_INCREMENT,
     listing_id  INT         NOT NULL,
@@ -168,6 +184,7 @@ CREATE TABLE FLAG (
     PRIMARY KEY (flag_id),
     FOREIGN KEY (listing_id) REFERENCES LISTING(listing_id)
 );
+
 CREATE TABLE BUNDLE_LISTING (
     bundle_id  INT NOT NULL,
     listing_id INT NOT NULL,
@@ -175,6 +192,7 @@ CREATE TABLE BUNDLE_LISTING (
     FOREIGN KEY (bundle_id)  REFERENCES BUNDLE(bundle_id),
     FOREIGN KEY (listing_id) REFERENCES LISTING(listing_id)
 );
+
 CREATE TABLE ADMIN_FLAG (
     admin_id INT NOT NULL,
     flag_id  INT NOT NULL,
