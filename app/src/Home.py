@@ -33,40 +33,72 @@ SideBarLinks(show_home=True)
 # ***************************************************
 
 logger.info("Loading the Home page of the app")
-st.title('CS 3200 Project Template')
-st.write('#### Hi! As which user would you like to log in?')
+st.title('📚 ShelfLife')
+st.write('#### Northeastern\'s campus course materials marketplace')
+st.write('Select your role below to get started.')
 
 # For each of the user personas for which we are implementing
 # functionality, we put a button on the screen that the user
 # can click to MIMIC logging in as that mock user.
 
-if st.button("Act as John, a Political Strategy Advisor",
-             type='primary',
-             use_container_width=True):
-    # when user clicks the button, they are now considered authenticated
-    st.session_state['authenticated'] = True
-    # we set the role of the current user
-    st.session_state['role'] = 'pol_strat_advisor'
-    # we add the first name of the user (so it can be displayed on
-    # subsequent pages).
-    st.session_state['first_name'] = 'John'
-    # finally, we ask streamlit to switch to another page, in this case, the
-    # landing page for this particular user type
-    logger.info("Logging in as Political Strategy Advisor Persona")
-    st.switch_page('pages/00_Pol_Strat_Home.py')
+st.divider()
 
-if st.button('Act as Mohammad, a USAID Worker',
-             type='primary',
-             use_container_width=True):
-    st.session_state['authenticated'] = True
-    st.session_state['role'] = 'usaid_worker'
-    st.session_state['first_name'] = 'Mohammad'
-    st.switch_page('pages/10_USAID_Worker_Home.py')
+col1, col2 = st.columns(2)
 
-if st.button('Act as System Administrator',
-             type='primary',
-             use_container_width=True):
-    st.session_state['authenticated'] = True
-    st.session_state['role'] = 'administrator'
-    st.session_state['first_name'] = 'SysAdmin'
-    st.switch_page('pages/20_Admin_Home.py')
+with col1:
+    st.write('**Student Seller**')
+    seller = st.selectbox(
+        'Select seller account:',
+        ['Maya Thomas', 'Priya Nair'],
+        key='seller_select'
+    )
+    if st.button('Log in as Seller', type='primary', use_container_width=True):
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = 'seller'
+        st.session_state['first_name'] = seller.split()[0]
+        st.session_state['user_id'] = 1 if seller == 'Maya Thomas' else 3
+        st.switch_page('pages/10_Seller_Home.py')
+
+with col2:
+    st.write('**Student Buyer**')
+    buyer = st.selectbox(
+        'Select buyer account:',
+        ['Ethan Park'],
+        key='buyer_select'
+    )
+    if st.button('Log in as Buyer', type='primary', use_container_width=True):
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = 'buyer'
+        st.session_state['first_name'] = buyer.split()[0]
+        st.session_state['user_id'] = 2
+        st.switch_page('pages/20_Buyer_Home.py')
+
+col3, col4 = st.columns(2)
+
+with col3:
+    st.write('**Data Analyst**')
+    analyst = st.selectbox(
+        'Select analyst account:',
+        ['Ricky Spiffy', 'Dana Cross'],
+        key='analyst_select'
+    )
+    if st.button('Log in as Analyst', type='primary', use_container_width=True):
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = 'analyst'
+        st.session_state['first_name'] = analyst.split()[0]
+        st.session_state['user_id'] = 1 if analyst == 'Ricky Spiffy' else 2
+        st.switch_page('pages/30_Analyst_Home.py')
+
+with col4:
+    st.write('**Platform Admin**')
+    admin = st.selectbox(
+        'Select admin account:',
+        ['Jordan Kanpa', 'Sarah Mitchell'],
+        key='admin_select'
+    )
+    if st.button('Log in as Admin', type='primary', use_container_width=True):
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = 'admin'
+        st.session_state['first_name'] = admin.split()[0]
+        st.session_state['user_id'] = 1 if admin == 'Jordan Kanpa' else 2
+        st.switch_page('pages/40_Admin_Home.py')

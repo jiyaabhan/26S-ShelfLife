@@ -1,94 +1,75 @@
-# Idea borrowed from https://github.com/fsmosca/sample-streamlit-authenticator
-
-# This file has functions to add links to the left sidebar based on the user's role.
-
 import streamlit as st
 
-
-# ---- General ----------------------------------------------------------------
 
 def home_nav():
     st.sidebar.page_link("Home.py", label="Home", icon="🏠")
 
 
-def about_page_nav():
-    st.sidebar.page_link("pages/30_About.py", label="About", icon="🧠")
+# ---- Role: seller -----------------------------------------------------------
+
+def seller_home_nav():
+    st.sidebar.page_link("pages/10_Seller_Home.py", label="Seller Dashboard", icon="👤")
+
+def create_listing_nav():
+    st.sidebar.page_link("pages/11_Create_Listing.py", label="Create Listing", icon="➕")
+
+def my_listings_nav():
+    st.sidebar.page_link("pages/12_My_Listings.py", label="My Listings", icon="📋")
+
+def seller_profile_nav():
+    st.sidebar.page_link("pages/13_Seller_Profile.py", label="My Profile & Reviews", icon="⭐")
 
 
-# ---- Role: pol_strat_advisor ------------------------------------------------
+# ---- Role: buyer ------------------------------------------------------------
 
-def pol_strat_home_nav():
-    st.sidebar.page_link(
-        "pages/00_Pol_Strat_Home.py", label="Political Strategist Home", icon="👤"
-    )
+def buyer_home_nav():
+    st.sidebar.page_link("pages/20_Buyer_Home.py", label="Browse", icon="🔍")
 
+def course_search_nav():
+    st.sidebar.page_link("pages/21_Course_Search.py", label="Search by Course", icon="📖")
 
-def world_bank_viz_nav():
-    st.sidebar.page_link(
-        "pages/01_World_Bank_Viz.py", label="World Bank Visualization", icon="🏦"
-    )
+def item_detail_nav():
+    st.sidebar.page_link("pages/22_Item_Detail.py", label="Item Detail", icon="🏷️")
 
-
-def map_demo_nav():
-    st.sidebar.page_link("pages/02_Map_Demo.py", label="Map Demonstration", icon="🗺️")
+def wishlist_nav():
+    st.sidebar.page_link("pages/23_Wishlist.py", label="My Wishlist", icon="❤️")
 
 
-# ---- Role: usaid_worker -----------------------------------------------------
+# ---- Role: analyst ----------------------------------------------------------
 
-def usaid_worker_home_nav():
-    st.sidebar.page_link(
-        "pages/10_USAID_Worker_Home.py", label="USAID Worker Home", icon="🏠"
-    )
+def analyst_home_nav():
+    st.sidebar.page_link("pages/30_Analyst_Home.py", label="Analyst Dashboard", icon="📊")
 
+def platform_overview_nav():
+    st.sidebar.page_link("pages/31_Platform_Overview.py", label="Platform Overview", icon="🌐")
 
-def ngo_directory_nav():
-    st.sidebar.page_link("pages/14_NGO_Directory.py", label="NGO Directory", icon="📁")
+def price_trends_nav():
+    st.sidebar.page_link("pages/32_Price_Trends.py", label="Price Trends", icon="📈")
 
-
-def add_ngo_nav():
-    st.sidebar.page_link("pages/15_Add_NGO.py", label="Add New NGO", icon="➕")
-
-
-def prediction_nav():
-    st.sidebar.page_link(
-        "pages/11_Prediction.py", label="Regression Prediction", icon="📈"
-    )
+def seller_activity_nav():
+    st.sidebar.page_link("pages/33_Seller_Activity.py", label="Seller Activity", icon="🏪")
 
 
-def api_test_nav():
-    st.sidebar.page_link("pages/12_API_Test.py", label="Test the API", icon="🛜")
-
-
-def classification_nav():
-    st.sidebar.page_link(
-        "pages/13_Classification.py", label="Classification Demo", icon="🌺"
-    )
-
-
-# ---- Role: administrator ----------------------------------------------------
+# ---- Role: admin ------------------------------------------------------------
 
 def admin_home_nav():
-    st.sidebar.page_link("pages/20_Admin_Home.py", label="System Admin", icon="🖥️")
+    st.sidebar.page_link("pages/40_Admin_Home.py", label="Admin Dashboard", icon="🖥️")
 
+def course_catalog_nav():
+    st.sidebar.page_link("pages/41_Course_Catalog.py", label="Course Catalog", icon="📚")
 
-def ml_model_mgmt_nav():
-    st.sidebar.page_link(
-        "pages/21_ML_Model_Mgmt.py", label="ML Model Management", icon="🏢"
-    )
+def flagged_listings_nav():
+    st.sidebar.page_link("pages/42_Flagged_Listings.py", label="Flagged Listings", icon="🚩")
+
+def user_accounts_nav():
+    st.sidebar.page_link("pages/43_User_Accounts.py", label="User Accounts", icon="👥")
 
 
 # ---- Sidebar assembly -------------------------------------------------------
 
 def SideBarLinks(show_home=False):
-    """
-    Renders sidebar navigation links based on the logged-in user's role.
-    The role is stored in st.session_state when the user logs in on Home.py.
-    """
-
-    # Logo appears at the top of the sidebar on every page
     st.sidebar.image("assets/logo.png", width=150)
 
-    # If no one is logged in, send them to the Home (login) page
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
         st.switch_page("Home.py")
@@ -98,25 +79,29 @@ def SideBarLinks(show_home=False):
 
     if st.session_state["authenticated"]:
 
-        if st.session_state["role"] == "pol_strat_advisor":
-            pol_strat_home_nav()
-            world_bank_viz_nav()
-            map_demo_nav()
+        if st.session_state["role"] == "seller":
+            seller_home_nav()
+            create_listing_nav()
+            my_listings_nav()
+            seller_profile_nav()
 
-        if st.session_state["role"] == "usaid_worker":
-            usaid_worker_home_nav()
-            ngo_directory_nav()
-            add_ngo_nav()
-            prediction_nav()
-            api_test_nav()
-            classification_nav()
+        elif st.session_state["role"] == "buyer":
+            buyer_home_nav()
+            course_search_nav()
+            item_detail_nav()
+            wishlist_nav()
 
-        if st.session_state["role"] == "administrator":
+        elif st.session_state["role"] == "analyst":
+            analyst_home_nav()
+            platform_overview_nav()
+            price_trends_nav()
+            seller_activity_nav()
+
+        elif st.session_state["role"] == "admin":
             admin_home_nav()
-            ml_model_mgmt_nav()
-
-    # About link appears at the bottom for all roles
-    about_page_nav()
+            course_catalog_nav()
+            flagged_listings_nav()
+            user_accounts_nav()
 
     if st.session_state["authenticated"]:
         if st.sidebar.button("Logout"):
