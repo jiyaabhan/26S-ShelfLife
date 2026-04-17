@@ -7,6 +7,11 @@ from backend.db_connection import init_app as init_db
 from backend.simple.simple_routes import simple_routes
 from backend.ngos.ngo_routes import ngos
 
+from backend.api.blueprints.analytics.routes import analytics_bp
+from backend.api.blueprints.courses.routes import courses_bp
+from backend.api.blueprints.listings.routes import listings_bp
+from backend.api.blueprints.transactions.routes import transactions_bp
+from backend.api.blueprints.users.routes import users_bp
 
 def create_app():
     app = Flask(__name__)
@@ -35,7 +40,16 @@ def create_app():
     # Register the routes from each Blueprint with the app object
     # and give a url prefix to each.
     app.logger.info("create_app(): registering blueprints")
+
     app.register_blueprint(simple_routes)
     app.register_blueprint(ngos, url_prefix="/ngo")
 
+    app.register_blueprint(simple_routes)
+    app.register_blueprint(ngos, url_prefix="/ngo")
+
+    app.register_blueprint(analytics_bp, url_prefix="/analytics")
+    app.register_blueprint(courses_bp, url_prefix="/courses")
+    app.register_blueprint(listings_bp, url_prefix="/listings")
+    app.register_blueprint(transactions_bp, url_prefix="/transactions")
+    app.register_blueprint(users_bp, url_prefix="/users")
     return app
