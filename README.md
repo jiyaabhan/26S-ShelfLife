@@ -88,6 +88,22 @@ This should start the project services in Docker.
 
 Any `.sql` files inside the `database-files/` folder are executed when a new database container is created. If the schema or sample data changes, the database container may need to be recreated so those files run again.
 
+## Demo Scenario (Key Features to Show)
+
+- A buyer searches for a specific course (for example, “CS 3200”) and views the listings that are tied to that course.
+
+- A seller creates a new listing for a textbook, including entering a title, description, price, and linking the listing to the correct course.
+
+- The interface shows how buyers can scan and compare multiple listings for the same course material to find an option that fits their budget.
+
+- If available, an admin or analytics view is opened briefly to show how the team can monitor marketplace activity and course level demand.
+
+- While the application is running, we point out the tech stack in use (Streamlit front end, Flask API, MySQL database, and Docker) and how the pieces fit together.
+
+## Testing
+
+We manually test ShelfLife by stepping through the main user flows from the perspective of each role. For buyers, we verify that searching by course, opening a listing, and moving between listings works without errors. For sellers, we create and update listings to confirm that forms save correctly and data appears in the expected place. When admin or analytics views are available, we open them to make sure pages load, filters behave as expected, and summary information matches the underlying sample data.
+
 ## Current Status
 
 ShelfLife is being developed as part of the Spring 2026 CS 3200 course project at Northeastern University. This README will continue to be updated as the application is finalized and more implementation details are confirmed.
