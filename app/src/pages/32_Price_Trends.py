@@ -16,39 +16,25 @@ st.divider()
 # response = requests.get('http://api:4000/price-history', params={'item': selected_item})
 # history = response.json()
 
-price_data = {
-    "Engineering Mechanics: Dynamics": [
-        {"Semester": "S'23", "Avg Sale Price": 165, "List Price": 175},
-        {"Semester": "F'23", "Avg Sale Price": 183, "List Price": 190},
-        {"Semester": "S'24", "Avg Sale Price": 193, "List Price": 200},
-        {"Semester": "F'24", "Avg Sale Price": 210, "List Price": 215},
-        {"Semester": "S'25", "Avg Sale Price": 215, "List Price": 225},
-    ],
-    "Organic Chemistry": [
-        {"Semester": "S'23", "Avg Sale Price": 70, "List Price": 80},
-        {"Semester": "F'23", "Avg Sale Price": 75, "List Price": 85},
-        {"Semester": "S'24", "Avg Sale Price": 80, "List Price": 90},
-        {"Semester": "F'24", "Avg Sale Price": 85, "List Price": 95},
-        {"Semester": "S'25", "Avg Sale Price": 90, "List Price": 100},
-    ],
-    "TI-84 Plus Graphing Calculator": [
-        {"Semester": "S'23", "Avg Sale Price": 45, "List Price": 55},
-        {"Semester": "F'23", "Avg Sale Price": 50, "List Price": 60},
-        {"Semester": "S'24", "Avg Sale Price": 55, "List Price": 65},
-        {"Semester": "F'24", "Avg Sale Price": 60, "List Price": 68},
-        {"Semester": "S'25", "Avg Sale Price": 65, "List Price": 70},
-    ],
-}
-
 col1, col2, col3 = st.columns(3)
 with col1:
-    selected_item = st.selectbox("Item / Category", list(price_data.keys()))
+    selected_item = st.selectbox(
+    "Item / Category",
+    ["Engineering Mechanics: Dynamics", "Organic Chemistry", "TI-84 Plus Graphing Calculator"]
+)
 with col2:
     time_range = st.selectbox("Time Range", ["Last 2 semesters", "Last 4 semesters", "All time"])
 with col3:
     condition_filter = st.selectbox("Condition", ["All conditions", "Unused", "Lightly Used", "Used"])
 
-df = pd.DataFrame(price_data[selected_item])
+import requests
+
+r = requests.get(
+    'http://api:4000/analytics/price-trends',
+    params={'course_id': selected_item}
+)
+history = r.json().get("points", []) if r.status_code == 200 else []
+df = pd.DataFrame(history) if history else pd.DataFrame()
 
 if time_range == "Last 2 semesters":
     df = df.tail(2)
@@ -75,18 +61,17 @@ st.divider()
 st.subheader("Recent Sales Data")
 st.dataframe(df, use_container_width=True)
 
-st.divider()
 if st.button("Export as CSV", type="primary"):
-    # TODO: POST request to generate report when API is ready
-    # requests.post('http://api:4000/reports', json={
-    #     "analyst_id": st.session_state['user_id'],
-    #     "filter_params": f"item={selected_item}",
-    #     "export_format": "CSV"
-    # })
-    csv = df.to_csv(index=False)
-    st.download_button(
-        label="Download CSV",
-        data=csv,
-        file_name=f"price_trends_{selected_item.replace(' ', '_')}.csv",
-        mime="text/csv"
-    )
+    r = requests.post('http://api:4000/analytics/reports', json={
+        "analyst_id": st.session_state['user_id'],
+        "filter_params": f"item={selected_item}",
+        "format": "CSV"
+    })
+    if r.status_code == 202:
+        csv = df.to_csv(index=False)
+        st.download_button(
+            "Download CSV",
+            data=csv,
+            file_name="price_trends.csv",
+            mime="text/csv"
+        )
