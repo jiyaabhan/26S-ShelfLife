@@ -55,7 +55,7 @@ if st.button("Publish Listing", type="primary", use_container_width=True):
         import streamlit as st
 from modules.nav import SideBarLinks
 
-SideBarLinks()
+
 
 if 'role' not in st.session_state or st.session_state['role'] != 'seller':
     st.switch_page('Home.py')
