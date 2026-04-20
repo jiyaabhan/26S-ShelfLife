@@ -1,13 +1,13 @@
 python
 from flask import Blueprint, jsonify, request
-from backend.db_connection import db
+from backend.db_connection import get_db
 
 analytics_bp = Blueprint("analytics", __name__)
 
 
 @analytics_bp.route("/metrics/latest", methods=["GET"])
 def get_latest_metrics():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT metric_id, active_users, total_listings, 
                total_transactions, recorded_at
@@ -19,7 +19,7 @@ def get_latest_metrics():
 
 @analytics_bp.route("/activity", methods=["GET"])
 def get_activity():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT DATE_FORMAT(sold_at, '%Y-%m-%dT%H:00:00Z') as ts,
                COUNT(*) as count
@@ -34,7 +34,7 @@ def get_activity():
 @analytics_bp.route("/price-trends", methods=["GET"])
 def get_price_trends():
     course_id = request.args.get("course_id")
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT ph.semester, ph.avg_price, i.title
         FROM PRICE_HISTORY ph
@@ -49,7 +49,7 @@ def get_price_trends():
 
 @analytics_bp.route("/demand-gaps", methods=["GET"])
 def get_demand_gaps():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT i.title, c.course_number,
                SUM(l.search_count) as total_searches,
@@ -68,7 +68,7 @@ def get_demand_gaps():
 
 @analytics_bp.route("/seller-activity", methods=["GET"])
 def get_seller_activity():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT u.name, u.avg_rating,
                COUNT(DISTINCT l.listing_id) as total_listings,
@@ -85,7 +85,7 @@ def get_seller_activity():
 
 @analytics_bp.route("/flags", methods=["GET"])
 def get_flags():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT f.flag_id, f.reason, f.flag_status, f.flagged_at,
                l.listing_id, i.title, l.price, l.condition_desc,
@@ -103,18 +103,18 @@ def get_flags():
 @analytics_bp.route("/flags/<int:flag_id>", methods=["PUT"])
 def update_flag(flag_id):
     body = request.get_json(silent=True) or {}
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         UPDATE FLAG SET flag_status = %s WHERE flag_id = %s
     ''', (body.get("flag_status", "Resolved"), flag_id))
-    db.get_db().commit()
+    get_db().commit()
     return jsonify({"updated": True, "flag_id": flag_id}), 200
 
 
 @analytics_bp.route("/reports", methods=["POST"])
 def create_report():
     body = request.get_json(silent=True) or {}
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         INSERT INTO REPORT (analyst_id, filter_params, export_format)
         VALUES (%s, %s, %s)
@@ -123,13 +123,13 @@ def create_report():
         body.get("filter_params", ""),
         body.get("format", "CSV")
     ))
-    db.get_db().commit()
+    get_db().commit()
     return jsonify({"report_id": cursor.lastrowid, "status": "queued"}), 202
 
 
 @analytics_bp.route("/departments/activity", methods=["GET"])
 def get_dept_activity():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT d.dept_name, COUNT(l.listing_id) as total_listings
         FROM LISTING l
@@ -143,7 +143,7 @@ def get_dept_activity():
 
 @analytics_bp.route("/transactions/volume", methods=["GET"])
 def get_transaction_volume():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT DATE_FORMAT(sold_at, '%b %Y') as month,
                COUNT(*) as transactions

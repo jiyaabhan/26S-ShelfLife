@@ -1,13 +1,13 @@
 python
 from flask import Blueprint, jsonify, request
-from backend.db_connection import db
+from backend.db_connection import get_db
 
 transactions_bp = Blueprint("transactions", __name__)
 
 
 @transactions_bp.route("/", methods=["GET"])
 def get_transactions():
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT t.transaction_id, t.sale_price, t.sold_at, t.days_to_sale,
                l.listing_id, i.title,
@@ -25,7 +25,7 @@ def get_transactions():
 @transactions_bp.route("/", methods=["POST"])
 def create_transaction():
     body = request.get_json(silent=True) or {}
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         INSERT INTO TRANSACTION (listing_id, buyer_id, sale_price, days_to_sale)
         VALUES (%s, %s, %s, %s)
@@ -35,12 +35,12 @@ def create_transaction():
         body.get("sale_price"),
         body.get("days_to_sale")
     ))
-    db.get_db().commit()
+    get_db().commit()
 
     cursor.execute('''
         UPDATE LISTING SET status = "Sold" WHERE listing_id = %s
     ''', (body.get("listing_id"),))
-    db.get_db().commit()
+    get_db().commit()
 
     return jsonify({"created": True, "transaction_id": cursor.lastrowid}), 201
 
@@ -48,7 +48,7 @@ def create_transaction():
 @transactions_bp.route("/daily-summary", methods=["GET"])
 def daily_summary():
     day = request.args.get("date", "2026-04-16")
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT COUNT(*) as transactions_count,
                SUM(sale_price) as total_gmv,
@@ -62,7 +62,7 @@ def daily_summary():
 @transactions_bp.route("/frequently-bought-together", methods=["GET"])
 def frequently_bought_together():
     course_id = request.args.get("course_id")
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT i.item_type, COUNT(t.transaction_id) as times_purchased,
                ROUND(AVG(t.sale_price), 2) as avg_sale_price
@@ -79,7 +79,7 @@ def frequently_bought_together():
 
 @transactions_bp.route("/<int:transaction_id>", methods=["GET"])
 def get_transaction(transaction_id):
-    cursor = db.get_db().cursor()
+    cursor = get_db().cursor()
     cursor.execute('''
         SELECT t.transaction_id, t.sale_price, t.sold_at, t.days_to_sale,
                l.listing_id, i.title,
