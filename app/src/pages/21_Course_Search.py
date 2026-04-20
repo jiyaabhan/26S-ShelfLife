@@ -11,10 +11,6 @@ st.title("Search by Course")
 st.write("Find all available materials for your class.")
 st.divider()
 
-import requests
-response = requests.get(f'http://api:4000/listings', params={'course': course_query})
-listings = response.json()
-
 
 
 col1, col2 = st.columns([2, 1])
@@ -34,7 +30,11 @@ with fcol3:
 
 st.divider()
 
-filtered = all_listings
+import requests
+response = requests.get(f'http://api:4000/listings', params={'course': course_query})
+listings = response.json()
+
+filtered = listings
 
 if course_query:
     filtered = [l for l in filtered if course_query.upper() in l['course'].upper()]
@@ -69,3 +69,4 @@ if filtered:
                     st.switch_page('pages/22_Item_Detail.py')
 else:
     st.info("No listings found. Try adjusting your filters.")
+
