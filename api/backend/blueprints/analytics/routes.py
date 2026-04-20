@@ -17,7 +17,6 @@ def get_latest_metrics():
     ''')
     return jsonify(cursor.fetchone()), 200
 
-
 @analytics_bp.route("/activity", methods=["GET"])
 def get_activity():
     cursor = db.get_db().cursor()
