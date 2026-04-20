@@ -1,51 +1,12 @@
-<<<<<<< HEAD
-"""Analytics — analyst/metrics dashboards (Phase 1 dummy responses)."""
-
-from __future__ import annotations
-
-from flask import Blueprint, jsonify, request
-=======
 
 from flask import Blueprint, jsonify, request
 from backend.db_connection import get_db
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
 
 analytics_bp = Blueprint("analytics", __name__)
 
 
 @analytics_bp.route("/metrics/latest", methods=["GET"])
 def get_latest_metrics():
-<<<<<<< HEAD
-    return (
-        jsonify(
-            {
-                "metric_id": 1,
-                "as_of": "2026-04-16T12:00:00Z",
-                "active_users": 120,
-                "active_listings": 1284,
-                "total_transactions": 210,
-                "gmv_cents": 18_400_000,
-            }
-        ),
-        200,
-    )
-
-
-@analytics_bp.route("/activity", methods=["GET"])
-def get_activity():
-    return (
-        jsonify(
-            {
-                "window": request.args.get("window", "7d"),
-                "events": [
-                    {"ts": "2026-04-15T10:00:00Z", "type": "listing_created", "count": 42},
-                    {"ts": "2026-04-15T11:00:00Z", "type": "transaction_completed", "count": 18},
-                ],
-            }
-        ),
-        200,
-    )
-=======
     cursor = get_db().cursor()
     cursor.execute('''
         SELECT metric_id, active_users, total_listings, 
@@ -68,27 +29,10 @@ def get_activity():
         LIMIT 20
     ''')
     return jsonify({"events": cursor.fetchall()}), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
 
 
 @analytics_bp.route("/price-trends", methods=["GET"])
 def get_price_trends():
-<<<<<<< HEAD
-    return (
-        jsonify(
-            {
-                "course_id": request.args.get("course_id", "CS3200"),
-                "material_type": request.args.get("material_type", "textbook"),
-                "points": [
-                    {"month": "2026-01", "median_price_cents": 4500},
-                    {"month": "2026-02", "median_price_cents": 4300},
-                    {"month": "2026-03", "median_price_cents": 4200},
-                ],
-            }
-        ),
-        200,
-    )
-=======
     course_id = request.args.get("course_id")
     cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
@@ -101,7 +45,6 @@ def get_price_trends():
         ORDER BY ph.semester
     ''', (course_id, course_id))
     return jsonify({"points": cursor.fetchall()}), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
 
 
 @analytics_bp.route("/demand-gaps", methods=["GET"])
