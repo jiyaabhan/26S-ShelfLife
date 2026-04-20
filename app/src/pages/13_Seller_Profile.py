@@ -9,26 +9,13 @@ if 'role' not in st.session_state or st.session_state['role'] != 'seller':
 st.title("My Profile & Reviews")
 st.divider()
 
-# TODO: replace with GET request when API is ready
-# import requests
-# response = requests.get(f'http://api:4000/users/{st.session_state["user_id"]}')
-# user = response.json()
+import requests
+r = requests.get(f'http://api:4000/users/{st.session_state["user_id"]}')
+user = r.json() if r.status_code == 200 else {}
 
-user = {
-    "name": "Maya Thomas",
-    "email": "thomas.ma@northeastern.edu",
-    "member_since": "Fall 2023",
-    "avg_rating": 4.8,
-    "total_reviews": 12,
-    "total_listings": 7,
-    "completed_sales": 4
-}
+r2 = requests.get(f'http://api:4000/users/{st.session_state["user_id"]}/reviews')
+reviews = r2.json().get("reviews", []) if r2.status_code == 200 else []
 
-reviews = [
-    {"reviewer": "Ethan P.", "semester": "Fall 2025", "rating": 5, "comment": "Fast response, item exactly as described."},
-    {"reviewer": "Priya N.", "semester": "Spring 2025", "rating": 4, "comment": "Great seller, easy pickup on campus."},
-    {"reviewer": "Sam K.", "semester": "Spring 2025", "rating": 5, "comment": "Item was in perfect condition. Would buy again!"},
-]
 
 col1, col2 = st.columns([1, 2])
 
