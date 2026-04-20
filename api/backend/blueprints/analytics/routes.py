@@ -1,51 +1,12 @@
-<<<<<<< HEAD
-"""Analytics — analyst/metrics dashboards (Phase 1 dummy responses)."""
-
-from __future__ import annotations
-
-from flask import Blueprint, jsonify, request
-=======
 
 from flask import Blueprint, jsonify, request
 from backend.db_connection import get_db
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
 
 analytics_bp = Blueprint("analytics", __name__)
 
 
 @analytics_bp.route("/metrics/latest", methods=["GET"])
 def get_latest_metrics():
-<<<<<<< HEAD
-    return (
-        jsonify(
-            {
-                "metric_id": 1,
-                "as_of": "2026-04-16T12:00:00Z",
-                "active_users": 120,
-                "active_listings": 1284,
-                "total_transactions": 210,
-                "gmv_cents": 18_400_000,
-            }
-        ),
-        200,
-    )
-
-
-@analytics_bp.route("/activity", methods=["GET"])
-def get_activity():
-    return (
-        jsonify(
-            {
-                "window": request.args.get("window", "7d"),
-                "events": [
-                    {"ts": "2026-04-15T10:00:00Z", "type": "listing_created", "count": 42},
-                    {"ts": "2026-04-15T11:00:00Z", "type": "transaction_completed", "count": 18},
-                ],
-            }
-        ),
-        200,
-    )
-=======
     cursor = get_db().cursor()
     cursor.execute('''
         SELECT metric_id, active_users, total_listings, 
@@ -58,7 +19,7 @@ def get_activity():
 
 @analytics_bp.route("/activity", methods=["GET"])
 def get_activity():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT DATE_FORMAT(sold_at, '%Y-%m-%dT%H:00:00Z') as ts,
                COUNT(*) as count
@@ -68,29 +29,12 @@ def get_activity():
         LIMIT 20
     ''')
     return jsonify({"events": cursor.fetchall()}), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
 
 
 @analytics_bp.route("/price-trends", methods=["GET"])
 def get_price_trends():
-<<<<<<< HEAD
-    return (
-        jsonify(
-            {
-                "course_id": request.args.get("course_id", "CS3200"),
-                "material_type": request.args.get("material_type", "textbook"),
-                "points": [
-                    {"month": "2026-01", "median_price_cents": 4500},
-                    {"month": "2026-02", "median_price_cents": 4300},
-                    {"month": "2026-03", "median_price_cents": 4200},
-                ],
-            }
-        ),
-        200,
-    )
-=======
     course_id = request.args.get("course_id")
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT ph.semester, ph.avg_price, i.title
         FROM PRICE_HISTORY ph
@@ -101,34 +45,10 @@ def get_price_trends():
         ORDER BY ph.semester
     ''', (course_id, course_id))
     return jsonify({"points": cursor.fetchall()}), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
 
 
 @analytics_bp.route("/demand-gaps", methods=["GET"])
 def get_demand_gaps():
-<<<<<<< HEAD
-    return (
-        jsonify(
-            {
-                "gaps": [
-                    {
-                        "course_id": "CS3000",
-                        "material": "Textbook",
-                        "wanted_count": 54,
-                        "available_count": 9,
-                    },
-                    {
-                        "course_id": "PHYS1000",
-                        "material": "Lab kit",
-                        "wanted_count": 31,
-                        "available_count": 4,
-                    },
-                ]
-            }
-        ),
-        200,
-    )
-=======
     cursor = get_db().cursor()
     cursor.execute('''
         SELECT i.title, c.course_number,
@@ -148,7 +68,7 @@ def get_demand_gaps():
 
 @analytics_bp.route("/seller-activity", methods=["GET"])
 def get_seller_activity():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT u.name, u.avg_rating,
                COUNT(DISTINCT l.listing_id) as total_listings,
@@ -165,7 +85,7 @@ def get_seller_activity():
 
 @analytics_bp.route("/flags", methods=["GET"])
 def get_flags():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT f.flag_id, f.reason, f.flag_status, f.flagged_at,
                l.listing_id, i.title, l.price, l.condition_desc,
@@ -183,7 +103,7 @@ def get_flags():
 @analytics_bp.route("/flags/<int:flag_id>", methods=["PUT"])
 def update_flag(flag_id):
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         UPDATE FLAG SET flag_status = %s WHERE flag_id = %s
     ''', (body.get("flag_status", "Resolved"), flag_id))
@@ -195,19 +115,6 @@ def update_flag(flag_id):
 @analytics_bp.route("/reports", methods=["POST"])
 def create_report():
     body = request.get_json(silent=True) or {}
-<<<<<<< HEAD
-    return (
-        jsonify(
-            {
-                "report_id": "RPT-1001",
-                "status": "queued",
-                "format": body.get("format", "csv"),
-                "filters": body.get("filters", {}),
-            }
-        ),
-        202,
-    )
-=======
     cursor = get_db().cursor()
     cursor.execute('''
         INSERT INTO REPORT (analyst_id, filter_params, export_format)
@@ -223,7 +130,7 @@ def create_report():
 
 @analytics_bp.route("/departments/activity", methods=["GET"])
 def get_dept_activity():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT d.dept_name, COUNT(l.listing_id) as total_listings
         FROM LISTING l
@@ -237,7 +144,7 @@ def get_dept_activity():
 
 @analytics_bp.route("/transactions/volume", methods=["GET"])
 def get_transaction_volume():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT DATE_FORMAT(sold_at, '%b %Y') as month,
                COUNT(*) as transactions

@@ -102,7 +102,7 @@ users_bp = Blueprint("users", __name__)
 
 @users_bp.route("/<int:user_id>", methods=["GET"])
 def get_user(user_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT user_id, name, email, is_active, avg_rating
         FROM USER WHERE user_id = %s
@@ -115,7 +115,7 @@ def get_user(user_id):
 
 @users_bp.route("/<int:user_id>/reviews", methods=["GET"])
 def get_user_reviews(user_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT r.review_id, r.rating, r.comment, r.created_at,
                u.name as reviewer
@@ -129,7 +129,7 @@ def get_user_reviews(user_id):
 
 @users_bp.route("/<int:user_id>/listings", methods=["GET"])
 def get_user_listings(user_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT l.listing_id, i.title, l.price, l.condition_desc,
                l.status, l.search_count, c.course_number, l.created_at
@@ -144,7 +144,7 @@ def get_user_listings(user_id):
 
 @users_bp.route("/<int:user_id>/transactions", methods=["GET"])
 def get_user_transactions(user_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT t.transaction_id, t.sale_price, t.sold_at,
                i.title, l.listing_id
@@ -159,7 +159,7 @@ def get_user_transactions(user_id):
 
 @users_bp.route("/<int:user_id>/wishlist", methods=["GET"])
 def get_wishlist(user_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT w.wishlist_id, w.saved_at, l.listing_id,
                i.title, l.price, l.condition_desc,
@@ -178,7 +178,7 @@ def get_wishlist(user_id):
 @users_bp.route("/<int:user_id>/wishlist", methods=["POST"])
 def add_to_wishlist(user_id):
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         INSERT INTO WISHLIST (user_id, listing_id)
         VALUES (%s, %s)
@@ -189,7 +189,7 @@ def add_to_wishlist(user_id):
 
 @users_bp.route("/<int:user_id>/wishlist/<int:wishlist_id>", methods=["DELETE"])
 def remove_from_wishlist(user_id, wishlist_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         DELETE FROM WISHLIST
         WHERE wishlist_id = %s AND user_id = %s
@@ -201,7 +201,7 @@ def remove_from_wishlist(user_id, wishlist_id):
 @users_bp.route("/<int:user_id>/deactivate", methods=["PUT"])
 def deactivate_user(user_id):
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         UPDATE USER SET is_active = FALSE WHERE user_id = %s
     ''', (user_id,))
@@ -219,7 +219,7 @@ def deactivate_user(user_id):
 
 @users_bp.route("/<int:user_id>/reactivate", methods=["PUT"])
 def reactivate_user(user_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         UPDATE USER SET is_active = TRUE WHERE user_id = %s
     ''', (user_id,))

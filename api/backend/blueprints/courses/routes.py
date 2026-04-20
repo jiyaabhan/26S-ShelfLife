@@ -82,7 +82,7 @@ courses_bp = Blueprint("courses", __name__)
 
 @courses_bp.route("/", methods=["GET"])
 def get_courses():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT c.course_id, c.course_number, c.course_name,
                c.is_active, d.dept_name, d.college
@@ -96,7 +96,7 @@ def get_courses():
 @courses_bp.route("/", methods=["POST"])
 def create_course():
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         INSERT INTO COURSE (course_number, course_name, is_active, dept_id)
         VALUES (%s, %s, TRUE, %s)
@@ -111,7 +111,7 @@ def create_course():
 
 @courses_bp.route("/<int:course_id>", methods=["GET"])
 def get_course(course_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT c.course_id, c.course_number, c.course_name,
                c.is_active, d.dept_name, d.college
@@ -128,7 +128,7 @@ def get_course(course_id):
 @courses_bp.route("/<int:course_id>", methods=["PUT"])
 def update_course(course_id):
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         UPDATE COURSE
         SET course_name = %s, is_active = %s
@@ -144,7 +144,7 @@ def update_course(course_id):
 
 @courses_bp.route("/<int:course_id>/deactivate", methods=["PUT"])
 def deactivate_course(course_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         UPDATE COURSE SET is_active = FALSE WHERE course_id = %s
     ''', (course_id,))
@@ -154,7 +154,7 @@ def deactivate_course(course_id):
 
 @courses_bp.route("/<int:course_id>/price-history", methods=["GET"])
 def get_price_history(course_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT ph.semester, ph.avg_price, i.title
         FROM PRICE_HISTORY ph
@@ -168,7 +168,7 @@ def get_price_history(course_id):
 
 @courses_bp.route("/departments", methods=["GET"])
 def get_departments():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('SELECT dept_id, dept_name, college FROM DEPARTMENT')
     return jsonify({"departments": cursor.fetchall()}), 200
 >>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
