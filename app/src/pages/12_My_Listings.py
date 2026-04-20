@@ -9,10 +9,12 @@ if 'role' not in st.session_state or st.session_state['role'] != 'seller':
 st.title("My Listings")
 st.divider()
 
-# TODO: replace with GET request when API is ready
-import requests
-response = requests.get(f'http://api:4000/listings/user/{st.session_state["user_id"]}')
-listings = response.json()
+try:
+    r = requests.get(f'http://api:4000/users/{st.session_state["user_id"]}/listings')
+    listings = r.json().get("listings", []) if r.status_code == 200 else []
+except Exception as e:
+    st.error(f"Could not load listings: {e}")
+    listings = []
 
 
 
