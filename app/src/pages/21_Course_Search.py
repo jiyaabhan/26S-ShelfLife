@@ -11,19 +11,7 @@ st.title("Search by Course")
 st.write("Find all available materials for your class.")
 st.divider()
 
-# TODO: replace with GET request when API is ready
-# import requests
-# response = requests.get(f'http://api:4000/listings', params={'course': course_query})
-# listings = response.json()
 
-all_listings = [
-    {"id": 1, "title": "Engineering Mechanics: Dynamics", "course": "MECH 2350", "condition": "Lightly Used", "price": 215.00, "seller": "Maya T.", "rating": 4.8, "type": "Textbook", "status": "Active"},
-    {"id": 2, "title": "TI-84 Plus Graphing Calculator", "course": "MECH 2350", "condition": "Unused", "price": 65.00, "seller": "Maya T.", "rating": 4.8, "type": "Equipment", "status": "Active"},
-    {"id": 3, "title": "Drawing Toolkit", "course": "MECH 2350", "condition": "Used", "price": 18.00, "seller": "Jordan K.", "rating": 3.9, "type": "Misc", "status": "Active"},
-    {"id": 4, "title": "Organic Chemistry", "course": "CHEM 2313", "condition": "Lightly Used", "price": 90.00, "seller": "Priya N.", "rating": 4.5, "type": "Textbook", "status": "Active"},
-    {"id": 5, "title": "Organic Chem Lab Manual", "course": "CHEM 2313", "condition": "Used", "price": 25.00, "seller": "Priya N.", "rating": 4.5, "type": "Misc", "status": "Active"},
-    {"id": 6, "title": "Database Design Textbook", "course": "CS 3200", "condition": "Lightly Used", "price": 55.00, "seller": "Alex M.", "rating": 4.2, "type": "Textbook", "status": "Active"},
-]
 
 col1, col2 = st.columns([2, 1])
 with col1:
@@ -42,7 +30,11 @@ with fcol3:
 
 st.divider()
 
-filtered = all_listings
+import requests
+response = requests.get(f'http://api:4000/listings', params={'course': course_query})
+listings = response.json()
+
+filtered = listings
 
 if course_query:
     filtered = [l for l in filtered if course_query.upper() in l['course'].upper()]
@@ -77,3 +69,4 @@ if filtered:
                     st.switch_page('pages/22_Item_Detail.py')
 else:
     st.info("No listings found. Try adjusting your filters.")
+

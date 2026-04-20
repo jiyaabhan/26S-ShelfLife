@@ -1,4 +1,5 @@
 import streamlit as st
+import requests
 from modules.nav import SideBarLinks
 
 SideBarLinks()
@@ -51,14 +52,15 @@ if st.button("Publish Listing", type="primary", use_container_width=True):
     elif price == 0:
         st.error("Please enter a price greater than $0.")
     else:
-        # TODO: replace with POST request to API when Ariz is ready
-        # payload = {
-        #     "user_id": st.session_state['user_id'],
-        #     "title": title,
-        #     "course": course,
-        #     "condition": condition,
-        #     "price": price
-        # }
-        # requests.post('http://api:4000/listings', json=payload)
-        st.success(f"Listing for '{title}' published successfully!")
-        st.balloons()
+        payload = {
+            "user_id": st.session_state['user_id'],
+            "course_id": 1,
+            "price": price,
+            "condition_desc": condition,
+        }
+        r = requests.post('http://api:4000/listings/', json=payload)
+        if r.status_code == 201:
+            st.success("Listing published!")
+            st.balloons()
+        else:
+            st.error("Something went wrong.")
