@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import requests
 from modules.nav import SideBarLinks
 
 SideBarLinks()
@@ -10,20 +11,8 @@ if 'role' not in st.session_state or st.session_state['role'] != 'admin':
 st.title("User Account Management")
 st.divider()
 
-# TODO: replace with GET request when API is ready
-# import requests
-# response = requests.get('http://api:4000/users')
-# users = response.json()
-
-if 'users' not in st.session_state:
-    st.session_state['users'] = [
-        {"id": 1, "name": "Maya Thomas", "email": "thomas.ma@northeastern.edu", "role": "Seller", "listings": 7, "sales": 4, "rating": 4.8, "reports": 0, "is_active": True, "joined": "Fall 2023"},
-        {"id": 2, "name": "Ethan Park", "email": "park.et@northeastern.edu", "role": "Buyer", "listings": 0, "sales": 0, "rating": None, "reports": 0, "is_active": True, "joined": "Fall 2025"},
-        {"id": 3, "name": "Priya Nair", "email": "nair.pr@northeastern.edu", "role": "Seller", "listings": 4, "sales": 3, "rating": 4.5, "reports": 0, "is_active": True, "joined": "Spring 2024"},
-        {"id": 4, "name": "Odessa Franklin", "email": "franklin.od@northeastern.edu", "role": "Seller", "listings": 6, "sales": 2, "rating": 2.8, "reports": 2, "is_active": True, "joined": "Fall 2025"},
-        {"id": 5, "name": "Alex Martinez", "email": "martinez.al@northeastern.edu", "role": "Seller", "listings": 9, "sales": 7, "rating": 4.2, "reports": 0, "is_active": True, "joined": "Spring 2023"},
-        {"id": 6, "name": "Sam Kim", "email": "kim.sa@northeastern.edu", "role": "Buyer", "listings": 0, "sales": 0, "rating": None, "reports": 0, "is_active": False, "joined": "Fall 2024"},
-    ]
+r = requests.get('http://api:4000/users/')
+users = r.json().get("users", []) if r.status_code == 200 else []
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -35,7 +24,7 @@ with col3:
 
 st.divider()
 
-filtered = st.session_state['users']
+filtered = users
 if search:
     filtered = [u for u in filtered if search.lower() in u['name'].lower() or search.lower() in u['email'].lower()]
 if role_filter != "All":
@@ -62,21 +51,23 @@ for user in filtered:
         with col3:
             if user['is_active']:
                 st.success("Active")
-                if st.button("View Full History", key=f"history_{user['id']}"):
-                    st.session_state[f"show_history_{user['id']}"] = True
-                if st.button("Deactivate Account", key=f"deactivate_{user['id']}"):
-                    # TODO: PUT request when API is ready
-                    # requests.put(f'http://api:4000/users/{user["id"]}', json={"is_active": False})
-                    # requests.put(f'http://api:4000/listings/user/{user["id"]}/deactivate-all')
-                    st.error(f"{user['name']}'s account deactivated and listings removed.")
+                if st.button("View Full History", key=f"history_{user['user_id']}"):
+                    st.session_state[f"show_history_{user['user_id']}"] = True
+                if st.button("Deactivate Account", key=f"deactivate_{user['user_id']}"):
+                    requests.put(
+                        f'http://api:4000/users/{user["user_id"]}/deactivate',
+                        json={"reason": "admin_action"}
+                    )
+                    st.error(f"{user['name']}'s account deactivated.")
+                    st.rerun()
             else:
                 st.error("Inactive")
-                if st.button("Reactivate Account", key=f"reactivate_{user['id']}"):
-                    # TODO: PUT request when API is ready
-                    # requests.put(f'http://api:4000/users/{user["id"]}', json={"is_active": True})
+                if st.button("Reactivate Account", key=f"reactivate_{user['user_id']}"):
+                    requests.put(f'http://api:4000/users/{user["user_id"]}/reactivate')
                     st.success(f"{user['name']}'s account reactivated.")
+                    st.rerun()
 
-        if st.session_state.get(f"show_history_{user['id']}"):
+        if st.session_state.get(f"show_history_{user['user_id']}"):
             st.write("**Listing & Transaction History**")
             history_data = {
                 "Item": ["Engineering Mechanics: Dynamics", "TI-84 Calculator", "CS 2500 Lab Kit"],
@@ -86,5 +77,5 @@ for user in filtered:
                 "Date Listed": ["Apr 10, 2026", "Apr 3, 2026", "Mar 15, 2026"]
             }
             st.dataframe(pd.DataFrame(history_data), use_container_width=True)
-            if st.button("Hide History", key=f"hide_{user['id']}"):
-                st.session_state[f"show_history_{user['id']}"] = False
+            if st.button("Hide History", key=f"hide_{user['user_id']}"):
+                st.session_state[f"show_history_{user['user_id']}"] = False
