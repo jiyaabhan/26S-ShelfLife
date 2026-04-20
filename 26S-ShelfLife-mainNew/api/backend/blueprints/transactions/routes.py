@@ -1,4 +1,4 @@
-"""Transactions — orders/settlement summaries (Phase 1 dummy responses).
+"""Transactions routes backed by real DB data.
 
 Static paths (`daily-summary`, `frequently-bought-together`) are declared before
 `/<transaction_id>` so they are not captured as IDs.
@@ -8,78 +8,146 @@ from __future__ import annotations
 
 from flask import Blueprint, jsonify, request
 
-transactions_bp = Blueprint("transactions", __name__)
+from api.db import get_cursor
 
-_DUMMY_TXNS = [
-    {
-        "transaction_id": "T-5001",
-        "buyer_user_id": "U-101",
-        "seller_user_id": "U-501",
-        "listing_id": "L-10001",
-        "amount_cents": 4200,
-        "status": "completed",
-    },
-    {
-        "transaction_id": "T-5002",
-        "buyer_user_id": "U-102",
-        "seller_user_id": "U-502",
-        "listing_id": "L-10002",
-        "amount_cents": 6500,
-        "status": "pending",
-    },
-]
+transactions_bp = Blueprint("transactions", __name__)
 
 
 @transactions_bp.route("/", methods=["GET", "POST"])
 def list_or_create_transactions():
     if request.method == "GET":
-        return jsonify({"transactions": _DUMMY_TXNS, "count": len(_DUMMY_TXNS)}), 200
+        with get_cursor() as cur:
+            cur.execute(
+                """
+                SELECT
+                    t.transaction_id,
+                    t.listing_id,
+                    t.buyer_id,
+                    l.user_id AS seller_id,
+                    t.sale_price,
+                    t.sold_at,
+                    t.days_to_sale
+                FROM `TRANSACTION` t
+                JOIN LISTING l ON l.listing_id = t.listing_id
+                ORDER BY t.transaction_id DESC
+                """
+            )
+            rows = cur.fetchall()
+        return jsonify({"transactions": rows, "count": len(rows)}), 200
+
     body = request.get_json(silent=True) or {}
-    created = {
-        "transaction_id": "T-99999",
-        "buyer_user_id": body.get("buyer_user_id"),
-        "seller_user_id": body.get("seller_user_id"),
-        "listing_id": body.get("listing_id"),
-        "amount_cents": body.get("amount_cents", 0),
-        "status": "pending",
-    }
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO `TRANSACTION` (listing_id, buyer_id, sale_price, sold_at, days_to_sale)
+            VALUES (%s, %s, %s, NOW(), %s)
+            """,
+            (
+                body.get("listing_id"),
+                body.get("buyer_id"),
+                body.get("sale_price"),
+                body.get("days_to_sale"),
+            ),
+        )
+        transaction_id = cur.lastrowid
+        cur.execute(
+            """
+            UPDATE LISTING
+            SET status = 'Sold'
+            WHERE listing_id = %s
+            """,
+            (body.get("listing_id"),),
+        )
+        cur.execute(
+            """
+            SELECT transaction_id, listing_id, buyer_id, sale_price, sold_at, days_to_sale
+            FROM `TRANSACTION`
+            WHERE transaction_id = %s
+            """,
+            (transaction_id,),
+        )
+        created = cur.fetchone()
     return jsonify({"created": True, "transaction": created}), 201
 
 
 @transactions_bp.route("/daily-summary", methods=["GET"])
 def daily_summary():
-    day = request.args.get("date", "2026-04-16")
+    day = request.args.get("date")
+    if not day:
+        with get_cursor() as cur:
+            cur.execute("SELECT DATE(MAX(sold_at)) AS latest_day FROM `TRANSACTION`")
+            latest = cur.fetchone()
+            day = str(latest["latest_day"]) if latest and latest["latest_day"] else None
+    if not day:
+        return jsonify({"error": "no_transactions"}), 404
+
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT
+                DATE(sold_at) AS date,
+                COUNT(*) AS transactions_count,
+                COALESCE(SUM(sale_price), 0) AS gmv
+            FROM `TRANSACTION`
+            WHERE DATE(sold_at) = %s
+            GROUP BY DATE(sold_at)
+            """,
+            (day,),
+        )
+        row = cur.fetchone()
+    if not row:
+        return jsonify({"date": day, "transactions_count": 0, "gmv": 0}), 200
     return (
-        jsonify(
-            {
-                "date": day,
-                "transactions_count": 37,
-                "gmv_cents": 142_500,
-                "refunds_count": 1,
-            }
-        ),
+        jsonify(row),
         200,
     )
 
 
 @transactions_bp.route("/frequently-bought-together", methods=["GET"])
 def frequently_bought_together():
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT
+                bl1.listing_id AS a,
+                bl2.listing_id AS b,
+                COUNT(*) AS together_count
+            FROM BUNDLE_LISTING bl1
+            JOIN BUNDLE_LISTING bl2
+                ON bl1.bundle_id = bl2.bundle_id
+               AND bl1.listing_id < bl2.listing_id
+            GROUP BY bl1.listing_id, bl2.listing_id
+            ORDER BY together_count DESC
+            LIMIT 20
+            """
+        )
+        pairs = cur.fetchall()
     return (
-        jsonify(
-            {
-                "pairs": [
-                    {"a": "L-10001", "b": "L-10040", "support": 0.12},
-                    {"a": "L-10002", "b": "L-10050", "support": 0.09},
-                ]
-            }
-        ),
+        jsonify({"pairs": pairs}),
         200,
     )
 
 
 @transactions_bp.route("/<transaction_id>", methods=["GET"])
 def get_transaction(transaction_id: str):
-    for row in _DUMMY_TXNS:
-        if row["transaction_id"] == transaction_id:
-            return jsonify(row), 200
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT
+                t.transaction_id,
+                t.listing_id,
+                t.buyer_id,
+                l.user_id AS seller_id,
+                t.sale_price,
+                t.sold_at,
+                t.days_to_sale
+            FROM `TRANSACTION` t
+            JOIN LISTING l ON l.listing_id = t.listing_id
+            WHERE t.transaction_id = %s
+            """,
+            (transaction_id,),
+        )
+        row = cur.fetchone()
+    if row:
+        return jsonify(row), 200
     return jsonify({"error": "not_found", "transaction_id": transaction_id}), 404
