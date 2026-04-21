@@ -14,8 +14,11 @@ st.divider()
 
 try:
     r = requests.get('http://api:4000/analytics/metrics/latest')
-    data = r.json() if r.status_code == 200 else {}
-    metrics = data[0] if isinstance(data, list) and len(data) > 0 else data if isinstance(data, dict) else {}
+    data = r.json() if r.status_code == 200 else []
+    metrics = {}
+    if isinstance(data, list) and len(data) > 0:
+        keys = ["metric_id", "active_users", "total_listings", "total_transactions", "recorded_at"]
+        metrics = dict(zip(keys, data))
 except Exception:
     metrics = {}
 
