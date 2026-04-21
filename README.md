@@ -110,11 +110,11 @@ ShelfLife is being developed as part of the Spring 2026 CS 3200 course project a
 
 ## Team
 
-- Ariz
-- Madhav
-- Vineeth
-- Jiya
-- Keila
+- Ariz Nawaz
+- Madhav Sabu
+- Vineeth Kanpa
+- Jiya Bhan
+- Keila Olaverria
 
 ## Demo Video
 
