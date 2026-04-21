@@ -11,8 +11,15 @@ if 'role' not in st.session_state or st.session_state['role'] != 'admin':
 st.title("User Account Management")
 st.divider()
 
-r = requests.get('http://api:4000/users/')
-users = r.json().get("users", []) if r.status_code == 200 else []
+try:
+    r = requests.get('http://api:4000/users/')
+    st.write(r.status_code)
+    st.write(r.text)
+    data = r.json() if r.status_code == 200 else {}
+    users = data.get("users", []) if isinstance(data, dict) else []
+except Exception as e:
+    st.error(f"Could not load users: {e}")
+    users = []
 
 col1, col2, col3 = st.columns(3)
 with col1:

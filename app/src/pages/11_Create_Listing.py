@@ -63,4 +63,4 @@ if st.button("Publish Listing", type="primary", use_container_width=True):
             st.success("Listing published!")
             st.balloons()
         else:
-            st.error("Something went wrong.")
+            st.error(f"Something went wrong. Status: {r.status_code} — {r.text}")
