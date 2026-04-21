@@ -34,6 +34,15 @@ with col2:
     price = st.number_input("Asking Price ($)", min_value=0.0, max_value=1000.0, step=0.50)
     condition_notes = st.text_area("Condition Notes", placeholder="e.g. Minor highlighting in chapters 1-3. Binding intact.")
 
+    st.subheader("Price Suggestions")
+    st.caption("Historical sales for this item (sample data)")
+    sample_history = {
+        "Semester": ["S'23", "F'23", "S'24", "F'24", "S'25"],
+        "Avg Sale Price": ["$165", "$183", "$193", "$210", "$215"]
+    }
+    st.table(sample_history)
+    st.info("Avg: $193 | Low: $165 | High: $215")
+
 st.divider()
 if st.button("Publish Listing", type="primary", use_container_width=True):
     if not title:
