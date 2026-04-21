@@ -70,14 +70,16 @@ def get_demand_gaps():
 def get_seller_activity():
     cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
-        SELECT u.name, u.avg_rating,
-               COUNT(DISTINCT l.listing_id) as total_listings,
-               COUNT(DISTINCT t.transaction_id) as completed_sales,
-               ROUND(AVG(t.days_to_sale), 1) as avg_days_to_sale
+        SELECT u.name, u.avg_rating, d.college,
+            COUNT(DISTINCT l.listing_id) as total_listings,
+            COUNT(DISTINCT t.transaction_id) as completed_sales,
+            ROUND(AVG(t.days_to_sale), 1) as avg_days_to_sale
         FROM USER u
         LEFT JOIN LISTING l ON u.user_id = l.user_id
         LEFT JOIN TRANSACTION t ON l.listing_id = t.listing_id
-        GROUP BY u.user_id, u.name, u.avg_rating
+        LEFT JOIN COURSE c ON l.course_id = c.course_id
+        LEFT JOIN DEPARTMENT d ON c.dept_id = d.dept_id
+        GROUP BY u.user_id, u.name, u.avg_rating, d.college
         ORDER BY completed_sales DESC
     ''')
     return jsonify({"sellers": cursor.fetchall()}), 200

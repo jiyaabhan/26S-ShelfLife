@@ -40,8 +40,17 @@ with col2:
         ["Total Listings", "Completed Sales", "Avg Days to Sale", "Avg Rating"]
     )
 
-if not df.empty and sort_col in df.columns:
-    df = df.sort_values(by=sort_col, ascending=False)
+if not df.empty:
+    if dept_filter != "All":
+        df = df[df["college"] == dept_filter]
+
+    sort_map = {
+        "Total Listings": "total_listings",
+        "Completed Sales": "completed_sales",
+        "Avg Days to Sale": "avg_days_to_sale",
+        "Avg Rating": "avg_rating"
+    }
+    df = df.sort_values(by=sort_map[sort_col], ascending=False)
 
 st.dataframe(df, use_container_width=True)
 
