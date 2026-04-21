@@ -149,8 +149,8 @@ def get_transaction_volume():
         SELECT DATE_FORMAT(sold_at, '%b %Y') as month,
                COUNT(*) as transactions
         FROM TRANSACTION
-        GROUP BY month
-        ORDER BY sold_at
+        GROUP BY DATE_FORMAT(sold_at, '%b %Y')
+        ORDER BY MIN(sold_at)
     ''')
     return jsonify({"volume": cursor.fetchall()}), 200
 
