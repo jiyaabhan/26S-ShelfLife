@@ -52,7 +52,7 @@ with col1:
                 st.error("Could not add to wishlist.")
         except Exception as e:
             st.error(f"Error: {e}")
-if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True):
+if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True, key="wishlist_btn"):
     try:
         r = requests.post(
             f'http://api:4000/users/{st.session_state["user_id"]}/wishlist',
@@ -67,7 +67,7 @@ if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True
 
 st.divider()
 
-if st.button("🛒 Buy Now", use_container_width=True):
+if st.button("🛒 Buy Now", use_container_width=True, key="buy_now_btn"):
     try:
         r = requests.post(
             'http://api:4000/transactions/',
@@ -85,7 +85,7 @@ if st.button("🛒 Buy Now", use_container_width=True):
             st.error(f"Could not complete purchase: {r.text}")
     except Exception as e:
         st.error(f"Error: {e}")
-        
+
     st.divider()
     st.subheader("Seller Reviews")
     if reviews:
