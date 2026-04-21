@@ -52,15 +52,26 @@ if st.button("Publish Listing", type="primary", use_container_width=True):
     elif price == 0:
         st.error("Please enter a price greater than $0.")
     else:
-        payload = {
-            "user_id": st.session_state['user_id'],
-            "course_id": 1,
-            "price": price,
-            "condition_desc": condition,
-        }
-        r = requests.post('http://api:4000/listings/', json=payload)
-        if r.status_code == 201:
-            st.success("Listing published!")
-            st.balloons()
+        item_r = requests.post('http://api:4000/items/', json={
+            "title": title,
+            "author": author,
+            "edition": edition,
+            "isbn": isbn,
+            "category": category,
+        })
+        if item_r.status_code != 201:
+            st.error(f"Failed to create item. Status: {item_r.status_code} — {item_r.text}")
         else:
-            st.error(f"Something went wrong. Status: {r.status_code} — {r.text}")
+            item_id = item_r.json().get("item_id")
+            r = requests.post('http://api:4000/listings/', json={
+                "user_id": st.session_state['user_id'],
+                "item_id": item_id,
+                "course_id": 1,
+                "price": price,
+                "condition_desc": condition,
+            })
+            if r.status_code == 201:
+                st.success("Listing published!")
+                st.balloons()
+            else:
+                st.error(f"Something went wrong. Status: {r.status_code} — {r.text}")
