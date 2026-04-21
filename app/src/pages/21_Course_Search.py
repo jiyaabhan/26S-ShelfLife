@@ -42,7 +42,7 @@ if condition_filter:
     filtered = [l for l in filtered if l['condition'] in condition_filter]
 if type_filter:
     filtered = [l for l in filtered if l['type'] in type_filter]
-filtered = [l for l in filtered if l['price'] <= max_price]
+filtered = [l for l in filtered if float(l['price']) <= max_price]
 
 if sort_by == "Price: Low to High":
     filtered = sorted(filtered, key=lambda x: x['price'])
