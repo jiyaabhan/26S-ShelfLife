@@ -120,6 +120,15 @@ def deactivate_user(user_id):
         "reason": body.get("reason", "admin_request")
     }), 200
 
+@users_bp.route("/", methods=["GET"])
+def get_all_users():
+    cursor = get_db().cursor(dictionary=True)
+    cursor.execute('''
+        SELECT user_id, name, email, is_active, avg_rating
+        FROM USER
+        ORDER BY name
+    ''')
+    return jsonify({"users": cursor.fetchall()}), 200
 
 @users_bp.route("/<int:user_id>/reactivate", methods=["PUT"])
 def reactivate_user(user_id):
