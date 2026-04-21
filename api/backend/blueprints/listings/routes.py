@@ -1,4 +1,3 @@
-python
 from flask import Blueprint, jsonify, request
 from backend.db_connection import get_db
 
@@ -7,13 +6,13 @@ listings_bp = Blueprint("listings", __name__)
 
 @listings_bp.route("/", methods=["GET"])
 def get_listings():
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     course = request.args.get("course")
     condition = request.args.get("condition")
     max_price = request.args.get("max_price")
 
     query = '''
-        SELECT l.listing_id, i.title, i.author, i.category, i.item_type,
+        SELECT l.listing_id, i.title, i.author, i.category,
                l.price, l.condition_desc, l.status, l.search_count,
                c.course_number, u.name as seller, u.avg_rating
         FROM LISTING l
@@ -42,7 +41,7 @@ def get_listings():
 @listings_bp.route("/", methods=["POST"])
 def create_listing():
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         INSERT INTO LISTING (user_id, item_id, course_id, price, condition_desc, status)
         VALUES (%s, %s, %s, %s, %s, "Active")
@@ -59,10 +58,10 @@ def create_listing():
 
 @listings_bp.route("/<int:listing_id>", methods=["GET"])
 def get_listing(listing_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT l.listing_id, i.title, i.author, i.edition, i.isbn,
-               i.category, i.item_type, l.price, l.condition_desc,
+               i.category, l.price, l.condition_desc,
                l.status, l.created_at, l.search_count,
                c.course_number, c.course_name,
                u.name as seller, u.avg_rating, u.user_id as seller_id
@@ -81,7 +80,7 @@ def get_listing(listing_id):
 @listings_bp.route("/<int:listing_id>", methods=["PUT"])
 def update_listing(listing_id):
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         UPDATE LISTING
         SET price = %s, condition_desc = %s, status = %s
@@ -98,7 +97,7 @@ def update_listing(listing_id):
 
 @listings_bp.route("/<int:listing_id>", methods=["DELETE"])
 def delete_listing(listing_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('DELETE FROM LISTING WHERE listing_id = %s', (listing_id,))
     get_db().commit()
     return jsonify({"deleted": True, "listing_id": listing_id}), 200
@@ -106,7 +105,7 @@ def delete_listing(listing_id):
 
 @listings_bp.route("/<int:listing_id>/reviews", methods=["GET"])
 def get_listing_reviews(listing_id):
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT r.review_id, r.rating, r.comment, r.created_at,
                u.name as reviewer
@@ -121,7 +120,7 @@ def get_listing_reviews(listing_id):
 @listings_bp.route("/<int:listing_id>/flag", methods=["POST"])
 def flag_listing(listing_id):
     body = request.get_json(silent=True) or {}
-    cursor = get_db().cursor()
+    cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         INSERT INTO FLAG (listing_id, reason, flag_status)
         VALUES (%s, %s, "Pending")
