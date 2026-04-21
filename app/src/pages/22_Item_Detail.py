@@ -52,7 +52,40 @@ with col1:
                 st.error("Could not add to wishlist.")
         except Exception as e:
             st.error(f"Error: {e}")
+if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True):
+    try:
+        r = requests.post(
+            f'http://api:4000/users/{st.session_state["user_id"]}/wishlist',
+            json={"listing_id": listing_id}
+        )
+        if r.status_code == 201:
+            st.success("Added to your wishlist!")
+        else:
+            st.error("Could not add to wishlist.")
+    except Exception as e:
+        st.error(f"Error: {e}")
 
+st.divider()
+
+if st.button("🛒 Buy Now", use_container_width=True):
+    try:
+        r = requests.post(
+            'http://api:4000/transactions/',
+            json={
+                "listing_id": listing_id,
+                "buyer_id": st.session_state['user_id'],
+                "sale_price": float(listing.get('price', 0)),
+                "days_to_sale": 1
+            }
+        )
+        if r.status_code == 201:
+            st.success("Purchase complete! The seller will be in touch.")
+            st.balloons()
+        else:
+            st.error(f"Could not complete purchase: {r.text}")
+    except Exception as e:
+        st.error(f"Error: {e}")
+        
     st.divider()
     st.subheader("Seller Reviews")
     if reviews:
