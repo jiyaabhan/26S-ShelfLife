@@ -12,8 +12,12 @@ st.title("Platform Overview")
 st.caption("ShelfLife Marketplace Health")
 st.divider()
 
-r = requests.get('http://api:4000/analytics/metrics/latest')
-metrics = r.json() if r.status_code == 200 else {}
+try:
+    r = requests.get('http://api:4000/analytics/metrics/latest')
+    data = r.json() if r.status_code == 200 else {}
+    metrics = data[0] if isinstance(data, list) and len(data) > 0 else data if isinstance(data, dict) else {}
+except Exception:
+    metrics = {}
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -29,34 +33,46 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Transaction Volume Over Time")
-    r2 = requests.get('http://api:4000/analytics/transactions/volume')
-    vol = r2.json().get("volume", []) if r2.status_code == 200 else []
-    if vol:
-        df_vol = pd.DataFrame(vol)
-        st.bar_chart(df_vol.set_index("month"))
-    else:
+    try:
+        r2 = requests.get('http://api:4000/analytics/transactions/volume')
+        vol_data = r2.json() if r2.status_code == 200 else {}
+        vol = vol_data.get("volume", []) if isinstance(vol_data, dict) else []
+        if vol:
+            df_vol = pd.DataFrame(vol)
+            st.bar_chart(df_vol.set_index("month"))
+        else:
+            st.info("No transaction data available.")
+    except Exception:
         st.info("No transaction data available.")
 
 with col2:
     st.subheader("Most Active Departments")
-    r3 = requests.get('http://api:4000/analytics/departments/activity')
-    depts = r3.json().get("departments", []) if r3.status_code == 200 else []
-    if depts:
-        df_dept = pd.DataFrame(depts)
-        st.bar_chart(df_dept.set_index("dept_name"))
-    else:
+    try:
+        r3 = requests.get('http://api:4000/analytics/departments/activity')
+        dept_data = r3.json() if r3.status_code == 200 else {}
+        depts = dept_data.get("departments", []) if isinstance(dept_data, dict) else []
+        if depts:
+            df_dept = pd.DataFrame(depts)
+            st.bar_chart(df_dept.set_index("dept_name"))
+        else:
+            st.info("No department data available.")
+    except Exception:
         st.info("No department data available.")
 
 st.divider()
 st.subheader("Top-Searched Items with Low Supply")
 st.caption("Items where search demand significantly exceeds available listings")
 
-r4 = requests.get('http://api:4000/analytics/demand-gaps')
-gaps = r4.json().get("gaps", []) if r4.status_code == 200 else []
-if gaps:
-    df = pd.DataFrame(gaps)
-    st.dataframe(df, use_container_width=True)
-else:
+try:
+    r4 = requests.get('http://api:4000/analytics/demand-gaps')
+    gaps_data = r4.json() if r4.status_code == 200 else {}
+    gaps = gaps_data.get("gaps", []) if isinstance(gaps_data, dict) else []
+    if gaps:
+        df = pd.DataFrame(gaps)
+        st.dataframe(df, use_container_width=True)
+    else:
+        st.info("No demand gap data available.")
+except Exception:
     st.info("No demand gap data available.")
 
 st.divider()
