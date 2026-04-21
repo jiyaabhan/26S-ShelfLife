@@ -21,7 +21,8 @@ except Exception:
     listing = listing_data
 
 try:
-    r2 = requests.get(f'http://api:4000/listings/{listing_id}/reviews')
+    seller_id = listing.get('seller_id')
+    r2 = requests.get(f'http://api:4000/users/{seller_id}/reviews')
     reviews = r2.json().get("reviews", []) if r2.status_code == 200 else []
 except Exception:
     reviews = []
@@ -96,7 +97,7 @@ with col2:
     st.divider()
     st.write("**Price History**")
     try:
-        r3 = requests.get(f'http://api:4000/courses/price-history/{listing.get("listing_id", 1)}')
+        r3 = requests.get(f'http://api:4000/courses/{listing.get("course_id")}/price-history')
         history = r3.json().get("history", []) if r3.status_code == 200 else []
         if history:
             df = pd.DataFrame(history)
