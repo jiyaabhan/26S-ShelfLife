@@ -1,4 +1,3 @@
-
 from flask import Blueprint, jsonify, request
 from backend.db_connection import get_db
 
@@ -13,7 +12,7 @@ def get_listings():
     max_price = request.args.get("max_price")
 
     query = '''
-        SELECT l.listing_id, i.title, i.author, i.category, i.item_type,
+        SELECT l.listing_id, i.title, i.author, i.category,
                l.price, l.condition_desc, l.status, l.search_count,
                c.course_number, u.name as seller, u.avg_rating
         FROM LISTING l
@@ -62,7 +61,7 @@ def get_listing(listing_id):
     cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
         SELECT l.listing_id, i.title, i.author, i.edition, i.isbn,
-               i.category, i.item_type, l.price, l.condition_desc,
+               i.category, l.price, l.condition_desc,
                l.status, l.created_at, l.search_count,
                c.course_number, c.course_name,
                u.name as seller, u.avg_rating, u.user_id as seller_id
