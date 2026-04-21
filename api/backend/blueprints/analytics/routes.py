@@ -109,7 +109,7 @@ def update_flag(flag_id):
     ''', (body.get("flag_status", "Resolved"), flag_id))
     get_db().commit()
     return jsonify({"updated": True, "flag_id": flag_id}), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
+
 
 
 @analytics_bp.route("/reports", methods=["POST"])
@@ -153,4 +153,4 @@ def get_transaction_volume():
         ORDER BY sold_at
     ''')
     return jsonify({"volume": cursor.fetchall()}), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
+
