@@ -77,12 +77,3 @@ try:
         st.info("No demand gap data available.")
 except Exception:
     st.info("No demand gap data available.")
-
-st.divider()
-col1, col2 = st.columns(2)
-with col1:
-    st.subheader("Filter by Semester")
-    st.selectbox("Semester", ["Fall 2025", "Spring 2025", "Fall 2024", "Spring 2024"])
-with col2:
-    st.subheader("Filter by College")
-    st.selectbox("College", ["All", "Khoury College", "College of Engineering", "College of Science"])
