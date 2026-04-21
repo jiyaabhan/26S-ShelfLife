@@ -8,8 +8,8 @@ def create_item():
     body = request.get_json(silent=True) or {}
     cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
-        INSERT INTO ITEM (title, author, edition, isbn, category)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO ITEM (title, author, isbn, category)
+        VALUES (%s, %s, %s, %s)
     ''', (
         body.get("title"),
         body.get("author"),
