@@ -57,7 +57,7 @@ def daily_summary():
         WHERE DATE(sold_at) = %s
     ''', (day,))
     return jsonify(cursor.fetchone()), 200
->>>>>>> b973242ce211e97bc1b86a60c6c43d1ad8a64c00
+
 
 
 @transactions_bp.route("/frequently-bought-together", methods=["GET"])
