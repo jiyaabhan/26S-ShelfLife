@@ -39,7 +39,9 @@ except Exception:
 
 if history:
     df = pd.DataFrame(history)
-
+    df['avg_price'] = df['avg_price'].astype(float)
+    df['low_price'] = df['low_price'].astype(float)
+    df['high_price'] = df['high_price'].astype(float)
     if time_range == "Last 2 semesters":
         df = df.tail(2)
     elif time_range == "Last 4 semesters":
