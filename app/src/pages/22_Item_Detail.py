@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import requests
 from modules.nav import SideBarLinks
 
@@ -7,7 +8,7 @@ SideBarLinks()
 if 'role' not in st.session_state or st.session_state['role'] != 'buyer':
     st.switch_page('Home.py')
 
-if st.button("← Back to Search Results"):
+if st.button("← Back to Search Results", key="back_btn"):
     st.switch_page('pages/21_Course_Search.py')
 
 listing_data = st.session_state.get('selected_listing', {})
@@ -38,41 +39,45 @@ with col1:
         st.write(f"**Author:** {listing.get('author')}")
     if listing.get('edition'):
         st.write(f"**Edition:** {listing.get('edition')}")
+
     st.divider()
 
-if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True, key="wishlist_btn"):
-    try:
-        r = requests.post(
-            f'http://api:4000/users/{st.session_state["user_id"]}/wishlist',
-            json={"listing_id": listing_id}
-        )
-        if r.status_code == 201:
-            st.success("Added to your wishlist!")
-        else:
-            st.error("Could not add to wishlist.")
-    except Exception as e:
-        st.error(f"Error: {e}")
+    if listing.get('status') == 'Active':
+        if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True, key="wishlist_btn"):
+            try:
+                r = requests.post(
+                    f'http://api:4000/users/{st.session_state["user_id"]}/wishlist',
+                    json={"listing_id": listing_id}
+                )
+                if r.status_code == 201:
+                    st.success("Added to your wishlist!")
+                else:
+                    st.error("Could not add to wishlist.")
+            except Exception as e:
+                st.error(f"Error: {e}")
 
-st.divider()
+        st.divider()
 
-if st.button("🛒 Buy Now", use_container_width=True, key="buy_now_btn"):
-    try:
-        r = requests.post(
-            'http://api:4000/transactions/',
-            json={
-                "listing_id": listing_id,
-                "buyer_id": st.session_state['user_id'],
-                "sale_price": float(listing.get('price', 0)),
-                "days_to_sale": 1
-            }
-        )
-        if r.status_code == 201:
-            st.success("Purchase complete! The seller will be in touch.")
-            st.balloons()
-        else:
-            st.error(f"Could not complete purchase: {r.text}")
-    except Exception as e:
-        st.error(f"Error: {e}")
+        if st.button("🛒 Buy Now", use_container_width=True, key="buy_now_btn"):
+            try:
+                r = requests.post(
+                    'http://api:4000/transactions/',
+                    json={
+                        "listing_id": listing_id,
+                        "buyer_id": st.session_state['user_id'],
+                        "sale_price": float(listing.get('price', 0)),
+                        "days_to_sale": 1
+                    }
+                )
+                if r.status_code == 201:
+                    st.success("Purchase complete! The seller will be in touch.")
+                    st.balloons()
+                else:
+                    st.error("Could not complete purchase — this listing may already be sold.")
+            except Exception as e:
+                st.error(f"Error: {e}")
+    else:
+        st.warning("This listing is no longer available.")
 
     st.divider()
     st.subheader("Seller Reviews")
@@ -87,13 +92,13 @@ if st.button("🛒 Buy Now", use_container_width=True, key="buy_now_btn"):
 
 with col2:
     st.metric("Asking Price", f"${float(listing.get('price', 0)):.2f}")
+    st.caption(f"Status: {listing.get('status', 'N/A')}")
     st.divider()
     st.write("**Price History**")
     try:
         r3 = requests.get(f'http://api:4000/courses/price-history/{listing.get("listing_id", 1)}')
         history = r3.json().get("history", []) if r3.status_code == 200 else []
         if history:
-            import pandas as pd
             df = pd.DataFrame(history)
             st.dataframe(df, use_container_width=True)
         else:
