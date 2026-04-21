@@ -13,7 +13,6 @@ def create_item():
     ''', (
         body.get("title"),
         body.get("author"),
-        body.get("edition"),
         body.get("isbn"),
         body.get("category"),
     ))
