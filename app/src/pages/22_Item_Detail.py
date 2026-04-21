@@ -40,18 +40,6 @@ with col1:
         st.write(f"**Edition:** {listing.get('edition')}")
     st.divider()
 
-    if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True):
-        try:
-            r = requests.post(
-                f'http://api:4000/users/{st.session_state["user_id"]}/wishlist',
-                json={"listing_id": listing_id}
-            )
-            if r.status_code == 201:
-                st.success("Added to your wishlist!")
-            else:
-                st.error("Could not add to wishlist.")
-        except Exception as e:
-            st.error(f"Error: {e}")
 if st.button("❤️ Save to Wishlist", type="primary", use_container_width=True, key="wishlist_btn"):
     try:
         r = requests.post(
