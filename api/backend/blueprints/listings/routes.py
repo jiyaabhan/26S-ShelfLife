@@ -13,8 +13,8 @@ def get_listings():
 
     query = '''
         SELECT l.listing_id, i.title, i.author, i.category,
-               l.price, l.condition_desc, l.status, l.search_count,
-               c.course_number, u.name as seller, u.avg_rating
+                l.price, l.condition_desc, l.status, l.search_count,
+                c.course_number, u.name as seller, u.avg_rating, u.user_id as seller_id, l.course_id
         FROM LISTING l
         JOIN ITEM i ON l.item_id = i.item_id
         JOIN COURSE c ON l.course_id = c.course_id
