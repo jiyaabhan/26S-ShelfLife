@@ -17,50 +17,79 @@ except Exception as e:
     st.error(f"Could not load listings: {e}")
     listings = []
 
-
-
 tab1, tab2, tab3 = st.tabs(["Active", "Reserved", "Sold"])
 
 def render_listing_card(listing):
     with st.container(border=True):
         col1, col2, col3 = st.columns([3, 1, 1])
         with col1:
-            st.write(f"**{listing['title']}**")
-            st.caption(f"{listing['course_number']} · {listing['condition_desc']}")
-            st.caption(f"Views: {listing['views']} · Saves: {listing['saves']}")
+            st.write(f"**{listing.get('title', 'N/A')}**")
+            st.caption(f"{listing.get('course_number', '')} · {listing.get('condition_desc', '')}")
+            st.caption(f"Search count: {listing.get('search_count', 0)}")
         with col2:
-            st.metric("Price", f"${listing['price']:.2f}")
+            st.metric("Price", f"${float(listing.get('price', 0)):.2f}")
         with col3:
-            st.caption(f"Status: {listing['status']}")
+            st.caption(f"Status: {listing.get('status', 'N/A')}")
 
         edit_col, sold_col, reserve_col = st.columns(3)
         with edit_col:
-            if st.button("Edit Price", key=f"edit_{listing['listing_id']}"):
-                st.session_state[f"editing_{listing['listing_id']}"] = True
+            if st.button("Edit Price", key=f"edit_{listing.get('listing_id')}"):
+                st.session_state[f"editing_{listing.get('listing_id')}"] = True
         with sold_col:
-            if st.button("Mark as Sold", key=f"sold_{listing['listing_id']}"):
-                requests.put(f'http://api:4000/listings/{listing["listing_id"]}',
-                json={"status": "Sold", "price": listing["price"],
-                      "condition_desc": listing["condition_desc"]})
-                st.success("Marked as sold!")
-                st.rerun()
+            if st.button("Mark as Sold", key=f"sold_{listing.get('listing_id')}"):
+                try:
+                    requests.put(
+                        f'http://api:4000/listings/{listing.get("listing_id")}',
+                        json={
+                            "status": "Sold",
+                            "price": float(listing.get("price", 0)),
+                            "condition_desc": listing.get("condition_desc", "")
+                        }
+                    )
+                    st.success("Marked as sold!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error: {e}")
         with reserve_col:
-            if st.button("Mark Reserved", key=f"reserve_{listing['listing_id']}"):
-                # TODO: PUT request
-                st.success("Marked as reserved!")
+            if st.button("Mark Reserved", key=f"reserve_{listing.get('listing_id')}"):
+                try:
+                    requests.put(
+                        f'http://api:4000/listings/{listing.get("listing_id")}',
+                        json={
+                            "status": "Reserved",
+                            "price": float(listing.get("price", 0)),
+                            "condition_desc": listing.get("condition_desc", "")
+                        }
+                    )
+                    st.success("Marked as reserved!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error: {e}")
 
-        if st.session_state.get(f"editing_{listing['listing_id']}"):
-            new_price = st.number_input("New Price ($)", value=listing['price'], key=f"price_{listing['listing_id']}")
-            if st.button("Save Price", key=f"save_{listing['listing_id']}"):
-                requests.put(f'http://api:4000/listings/{listing["listing_id"]}',
-                json={"price": new_price, "status": listing["status"],
-                      "condition_desc": listing["condition_desc"]})
-                st.success("Price updated!")
-                st.session_state[f"editing_{listing['listing_id']}"] = False
-                st.rerun()
+        if st.session_state.get(f"editing_{listing.get('listing_id')}"):
+            new_price = st.number_input(
+                "New Price ($)",
+                value=float(listing.get('price', 0)),
+                key=f"price_{listing.get('listing_id')}"
+            )
+            if st.button("Save Price", key=f"save_{listing.get('listing_id')}"):
+                try:
+                    requests.put(
+                        f'http://api:4000/listings/{listing.get("listing_id")}',
+                        json={
+                            "price": new_price,
+                            "status": listing.get("status", "Active"),
+                            "condition_desc": listing.get("condition_desc", "")
+                        }
+                    )
+                    st.success("Price updated!")
+                    st.session_state[f"editing_{listing.get('listing_id')}"] = False
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Error: {e}")
 
 with tab1:
-    active = [l for l in listings if l['status'] == 'Active']
+    active = [l for l in listings if l.get('status') == 'Active']
     if active:
         for listing in active:
             render_listing_card(listing)
@@ -68,7 +97,7 @@ with tab1:
         st.info("No active listings.")
 
 with tab2:
-    reserved = [l for l in listings if l['status'] == 'Reserved']
+    reserved = [l for l in listings if l.get('status') == 'Reserved']
     if reserved:
         for listing in reserved:
             render_listing_card(listing)
@@ -76,4 +105,9 @@ with tab2:
         st.info("No reserved listings.")
 
 with tab3:
-    st.info("No sold listings yet.")
+    sold = [l for l in listings if l.get('status') == 'Sold']
+    if sold:
+        for listing in sold:
+            render_listing_card(listing)
+    else:
+        st.info("No sold listings yet.")
