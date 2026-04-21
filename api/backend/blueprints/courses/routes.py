@@ -81,11 +81,15 @@ def deactivate_course(course_id):
 def get_price_history(course_id):
     cursor = get_db().cursor(dictionary=True)
     cursor.execute('''
-        SELECT ph.semester, ph.avg_price, i.title
+        SELECT ph.semester, ph.avg_price, ph.low_price, ph.high_price, 
+               ph.total_sales, i.title
         FROM PRICE_HISTORY ph
         JOIN ITEM i ON ph.item_id = i.item_id
-        JOIN COURSE_ITEM ci ON i.item_id = ci.item_id
-        WHERE ci.course_id = %s
+        WHERE ph.item_id IN (
+            SELECT DISTINCT cm.item_id 
+            FROM COURSE_MATERIAL cm 
+            WHERE cm.course_id = %s
+        )
         ORDER BY ph.semester
     ''', (course_id,))
     return jsonify({"history": cursor.fetchall()}), 200
