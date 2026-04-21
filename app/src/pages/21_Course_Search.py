@@ -37,7 +37,7 @@ listings = response.json()
 filtered = listings
 
 if course_query:
-    filtered = [l for l in filtered if course_query.upper() in l['course'].upper()]
+    filtered = [l for l in filtered if course_query.upper() in l['course_number'].upper()]
 if condition_filter:
     filtered = [l for l in filtered if l['condition'] in condition_filter]
 if type_filter:
@@ -59,12 +59,12 @@ if filtered:
             col1, col2, col3 = st.columns([3, 1, 1])
             with col1:
                 st.write(f"**{listing['title']}**")
-                st.caption(f"{listing['course']} · {listing['condition']} · {listing['type']}")
-                st.caption(f"Listed by: {listing['seller']} (⭐ {listing['rating']})")
+                st.caption(f"{listing['course']} · {listing['condition_desc']} · {listing['type']}")
+                st.caption(f"Listed by: {listing['seller']} (⭐ {listing['avg_rating']})")
             with col2:
                 st.metric("Price", f"${listing['price']:.2f}")
             with col3:
-                if st.button("View Details", key=f"view_{listing['id']}"):
+                if st.button("View Details", key=f"view_{listing['listing_id']}"):
                     st.session_state['selected_listing'] = listing
                     st.switch_page('pages/22_Item_Detail.py')
 else:
