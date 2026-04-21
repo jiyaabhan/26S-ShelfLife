@@ -118,4 +118,4 @@ ShelfLife is being developed as part of the Spring 2026 CS 3200 course project a
 
 ## Demo Video
 
-Demo link: https://drive.google.com/file/d/1wyOjc-L_2R6W3y-NBtAGiXn-UOk6hF4I/view?usp=sharing
+Demo link: https://www.youtube.com/watch?v=jpNh5U-58YQ
