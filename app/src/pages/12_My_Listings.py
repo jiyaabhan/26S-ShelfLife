@@ -26,7 +26,7 @@ def render_listing_card(listing):
         col1, col2, col3 = st.columns([3, 1, 1])
         with col1:
             st.write(f"**{listing['title']}**")
-            st.caption(f"{listing['course']} · {listing['condition_desc']}")
+            st.caption(f"{listing['course_number']} · {listing['condition_desc']}")
             st.caption(f"Views: {listing['views']} · Saves: {listing['saves']}")
         with col2:
             st.metric("Price", f"${listing['price']:.2f}")
